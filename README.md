@@ -3,8 +3,8 @@
 ## Group T0xG0y
 | Name             | Number    | E-Mail             |
 | ---------------- | --------- | ------------------ |
-| John Doe         | 201901010 | ...                |
-| Jane Doe         | 201901011 | ...                |
+| Guilherme de Sá Guerra        | 202205140 | up202205140@up.pt                |
+| Antonio Abilio Parada Santos         | 202205469 | up202205469@up.pt                |
 
 ----
 
