@@ -24,6 +24,7 @@ export class MyInterface extends CGFinterface {
         this.gui.add(this.scene, 'scaleFactor', 0.1, 5).name('Scale Factor');
 
         this.gui.add(this.scene, 'showTangram').name('Show Tangram');
+        this.gui.add(this.scene, 'showUnitCube').name('Show Unit Cube');
 
 
         return true;

@@ -1,5 +1,7 @@
 import { CGFscene, CGFcamera, CGFaxis } from "../lib/CGF.js";
 import { MyTangram } from "./Objects/MyTangram.js";
+import { MyUnitCube } from "./Objects/MyUnitCube.js";
+import { getXRotationMatrix, getZRotationMatrix } from "./utils/utils.js";
 
 
 /**
@@ -28,11 +30,13 @@ export class MyScene extends CGFscene {
     this.axis = new CGFaxis(this);
 
     this.tangram = new MyTangram(this);
+    this.unitCube = new MyUnitCube(this);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
     this.scaleFactor = 1;
     this.showTangram = true;
+    this.showUnitCube = true;
   }
   initLights() {
     this.lights[0].setPosition(15, 2, 5, 1);
@@ -71,7 +75,20 @@ export class MyScene extends CGFscene {
 
     this.setDefaultAppearance();
 
+
+    this.pushMatrix()
+    this.multMatrix(getXRotationMatrix(-90))
+    this.translate(2 * Math.sqrt(2) + 1, - 2 * Math.sqrt(2), 0)
     if (this.showTangram) this.tangram.display();
+    this.popMatrix()
+
+    // Place the cube behind the tangram
+    this.pushMatrix();
+    this.scale(8, 8, 8)
+    this.translate(0.5, -0.51, 0.5);
+    this.setDiffuse(1, 1, 1, 0)
+    if (this.showUnitCube) this.unitCube.display();
+    this.popMatrix()
 
   }
 }

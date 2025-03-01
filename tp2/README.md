@@ -11,3 +11,17 @@ This is because rotating first will also rotate the axis which will make it hard
 
 ![Screenshot 1](screenshots/cg-t04g08-tp2-1.png)
 
+### Exercice 2
+
+In this exercice we found that it was hard to differentiate the cube and the tangram. To fix this we went digging and found that we were somewhat able to
+change the colors of the faces by using 
+
+```js 
+setDiffuse(redValue / 255, greenValue / 255, blueValue / 255, 0)
+```
+
+Also we found that if the cube was right behind the tnagram (to a point where both touch) even with different colors the tangram was not visible. To fix this instead of moving the cube by -0.5 on the y axis we moved it with a yOffset of -0.6.
+
+![Screenshot 2](screenshots/cg-t04g08-tp2-2.png)
+
+

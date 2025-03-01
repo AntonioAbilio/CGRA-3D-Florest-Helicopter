@@ -47,6 +47,7 @@ export class MyTangram extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(translateForMediumTriangle);
         this.scene.multMatrix(rotMatrixZForMediumTriangle);
+        this.scene.setDiffuse(241 / 255, 161 / 255, 208 / 255, 0)
         this.head.display();
         this.scene.popMatrix();
 
@@ -60,6 +61,7 @@ export class MyTangram extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(rotMatrixZForDiamond);
         this.scene.multMatrix(translateForDiamond);
+        this.scene.setDiffuse(0, 1, 0, 0)
         this.neck.display();
         this.scene.popMatrix();
 
@@ -73,6 +75,7 @@ export class MyTangram extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(rotMatrixZForBigTriangle);
         this.scene.multMatrix(translateForBigTriangle);
+        this.scene.setDiffuse(0, 0, 1, 0)
         this.upperBody.display();
         this.scene.popMatrix();
 
@@ -85,6 +88,7 @@ export class MyTangram extends CGFobject {
 
         this.scene.pushMatrix();
         this.scene.multMatrix(translateForSmallTriangle);
+        this.scene.setDiffuse(159 / 255, 84 / 255, 188 / 255, 0)
         this.frontLegs.display();
         this.scene.popMatrix();
 
@@ -98,6 +102,7 @@ export class MyTangram extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(translateForBigTriangle);
         this.scene.multMatrix(rotMatrixZForBigTriangle);
+        this.scene.setDiffuse(241 / 255, 161 / 255, 57 / 255, 0)
         this.lowerBody.display();
         this.scene.popMatrix();
 
@@ -111,6 +116,7 @@ export class MyTangram extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(translateForSmallTriangle);
         this.scene.multMatrix(rotMatrixZForSmallTriangle);
+        this.scene.setDiffuse(1, 0, 0, 0)
         this.backLegs.display();
         this.scene.popMatrix();
 
@@ -124,6 +130,7 @@ export class MyTangram extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(translateForParallelogram);
         this.scene.multMatrix(rotMatrixZForParallelogram);
+        this.scene.setDiffuse(1, 1, 0, 0)
         this.tail.display();
         this.scene.popMatrix();
     }
