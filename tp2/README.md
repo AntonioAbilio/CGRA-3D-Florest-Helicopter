@@ -9,5 +9,5 @@ This is because rotating first will also rotate the axis which will make it hard
 
 ### Exercice 1
 
-![Screenshot 1](screenshots/47-horse.png)
+![Screenshot 1](screenshots/cg-t04g08-tp2-1.png)
 
