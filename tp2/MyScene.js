@@ -1,27 +1,6 @@
 import { CGFscene, CGFcamera, CGFaxis } from "../lib/CGF.js";
-import { MyDiamond } from "./MyDiamond.js";
-import { MyParallelogram } from "./MyParallelogram.js";
-import { MyTriangle } from "./MyTriangle.js";
-import { MyTriangleSmall } from "./MyTriangleSmall.js";
-import { MyTriangleBig } from "./MyTriangleBig.js";
+import { MyTangram } from "./Objects/MyTangram.js";
 
-
-function getRad(decimalDegree) {
-  return (Math.PI * decimalDegree) / 180;
-}
-
-
-function getZRotationMatrix(decimalDegree) {
-
-  var rad = getRad(decimalDegree)
-
-  return [
-    Math.cos(rad), Math.sin(rad), 0, 0,
-    -Math.sin(rad), Math.cos(rad), 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
-  ]
-}
 
 /**
  * MyScene
@@ -47,20 +26,13 @@ export class MyScene extends CGFscene {
 
     //Initialize scene objects
     this.axis = new CGFaxis(this);
-    this.diamond = new MyDiamond(this);
-    this.firstTriangle = new MyTriangle(this);
-    this.parallelogram = new MyParallelogram(this);
-    this.smallTriangle = new MyTriangleSmall(this);
-    this.bigTriangle = new MyTriangleBig(this);
+
+    this.tangram = new MyTangram(this);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
     this.scaleFactor = 1;
-    this.showDiamond = false;
-    this.showFirstTriangle = false;
-    this.showParallelogram = false;
-    this.showSmallTriangle = false;
-    this.showBigTriangle = true;
+    this.showTangram = true;
   }
   initLights() {
     this.lights[0].setPosition(15, 2, 5, 1);
@@ -99,38 +71,7 @@ export class MyScene extends CGFscene {
 
     this.setDefaultAppearance();
 
+    if (this.showTangram) this.tangram.display();
 
-    let test = [
-      0, -1, 0, 0,
-      1, 0, 0, 0,
-      0, 0, 1, 0,
-      2, 0, 0, 1
-    ]
-
-    this.pushMatrix();
-    this.rotate(getRad(270), 0, 0, 1);
-    this.translate(2, 0, 0);
-    if (this.showBigTriangle) this.bigTriangle.display();
-    this.popMatrix();
-
-    // Using the non-rotated xy plane
-    /* this.pushMatrix();
-    this.translate(-Math.sqrt(2), -Math.sqrt(2), 0);
-    this.rotate(getRad(315), 0, 0, 1);
-    this.bigTriangle.display();
-    this.popMatrix(); */
-
-    this.pushMatrix();
-    this.rotate(getRad(315), 0, 0, 1);
-    this.translate(0, -2, 0);
-    if (this.showBigTriangle) this.bigTriangle.display();
-    this.popMatrix();
-
-    if (this.showDiamond) this.diamond.display();
-    if (this.showParallelogram) this.parallelogram.display();
-    if (this.showFirstTriangle) this.firstTriangle.display();
-    if (this.showSmallTriangle) this.smallTriangle.display();
-
-    // ---- END Primitive drawing section
   }
 }
