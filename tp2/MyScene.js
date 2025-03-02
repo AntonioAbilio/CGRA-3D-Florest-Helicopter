@@ -1,6 +1,8 @@
 import { CGFscene, CGFcamera, CGFaxis } from "../lib/CGF.js";
+import { MyQuad } from "./Objects/MyQuad.js";
 import { MyTangram } from "./Objects/MyTangram.js";
 import { MyUnitCube } from "./Objects/MyUnitCube.js";
+import { MyUnitCubeQuad } from "./Objects/MyUnitCubeQuad.js";
 import { getXRotationMatrix, getZRotationMatrix } from "./utils/utils.js";
 
 
@@ -31,12 +33,16 @@ export class MyScene extends CGFscene {
 
     this.tangram = new MyTangram(this);
     this.unitCube = new MyUnitCube(this);
+    this.quad = new MyQuad(this);
+    this.unitCubeQuad = new MyUnitCubeQuad(this);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
     this.scaleFactor = 1;
     this.showTangram = true;
-    this.showUnitCube = true;
+    this.showUnitCube = false;
+    this.showQuad = false;
+    this.showUnitCubeQuad = true;
   }
   initLights() {
     this.lights[0].setPosition(15, 2, 5, 1);
@@ -76,19 +82,38 @@ export class MyScene extends CGFscene {
     this.setDefaultAppearance();
 
 
-    this.pushMatrix()
-    this.multMatrix(getXRotationMatrix(-90))
-    this.translate(2 * Math.sqrt(2) + 1, - 2 * Math.sqrt(2), 0)
-    if (this.showTangram) this.tangram.display();
-    this.popMatrix()
+    if (this.showTangram) {
+      this.pushMatrix()
+      this.multMatrix(getXRotationMatrix(-90))
+      this.translate(2 * Math.sqrt(2) + 1, - 2 * Math.sqrt(2), 0)
+      this.tangram.display();
+      this.popMatrix()
+      this.setDiffuse(0.2, 0.4, 0.8, 1.0);
+    }
 
     // Place the cube behind the tangram
-    this.pushMatrix();
-    this.scale(8, 8, 8)
-    this.translate(0.5, -0.51, 0.5);
-    this.setDiffuse(1, 1, 1, 0)
-    if (this.showUnitCube) this.unitCube.display();
-    this.popMatrix()
+    if (this.showUnitCube) {
+      this.pushMatrix();
+      this.scale(8, 8, 8)
+      this.translate(0.5, -0.51, 0.5);
+      this.setDiffuse(1, 1, 1, 0)
+      this.unitCube.display();
+      this.popMatrix()
+      this.setDiffuse(0.2, 0.4, 0.8, 1.0);
+    }
+
+    if (this.showQuad) {
+      this.quad.display()
+    }
+
+    if (this.showUnitCubeQuad) {
+      this.setDiffuse(0.2, 0.4, 0.8, 1.0);
+      this.pushMatrix();
+      this.scale(8, 8, 8)
+      this.translate(0.5, -0.51, 0.5);
+      this.unitCubeQuad.display()
+      this.popMatrix()
+    }
 
   }
 }

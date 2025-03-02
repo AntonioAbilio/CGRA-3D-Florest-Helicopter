@@ -24,4 +24,11 @@ Also we found that if the cube was right behind the tnagram (to a point where bo
 
 ![Screenshot 2](screenshots/cg-t04g08-tp2-2.png)
 
+### Exercice 3
 
+This exercice was very similar to the last one to the point that the trnasformation that were performed on the cube worked without problems in the new cube made up of squares.
+However we did notice that the light has changed and we suspect that it is due to the rotation that the were applied to the squares.
+
+Just like in the other exercice we also colored the tangram and moved the cube by -0.6 on the y axis instead of moving it with a yOffset of -0.5.
+
+![Screenshot 3](screenshots/cg-t04g08-tp2-3.png)
