@@ -2,6 +2,8 @@ import { CGFscene, CGFcamera, CGFaxis, CGFappearance } from "../lib/CGF.js";
 import { MyPyramid } from "./MyPyramid.js";
 import { MyCone } from "./MyCone.js";
 import { MyPlane } from "./MyPlane.js";
+import { MyTangram } from "./Objects/MyTangram.js";
+import { MyUnitCube } from "./Objects/MyUnitCube.js";
 
 /**
 * MyScene
@@ -30,17 +32,19 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 5);
     this.cone = new MyCone(this, 3, 1);
     this.pyramid = new MyPyramid(this, 3, 1);
+    this.tangram = new MyTangram(this);
+    this.unitcube = new MyUnitCube(this);
 
-    this.objects = [this.plane, this.pyramid, this.cone];
+    this.objects = [this.plane, this.pyramid, this.cone, this.tangram, this.unitcube];
 
     // Labels and ID's for object selection on MyInterface
-    this.objectIDs = { 'Plane': 0, 'Pyramid': 1, 'Cone': 2 };
+    this.objectIDs = { 'Plane': 0, 'Pyramid': 1, 'Cone': 2, 'Tangram': 3, 'UnitCube': 4 };
 
     //Other variables connected to MyInterface
-    this.selectedObject = 0;
+    this.selectedObject = 4;
     this.selectedMaterial = 0;
     this.displayAxis = true;
-    this.displayNormals = false;
+    this.displayNormals = true;
     this.objectComplexity = 0.5;
     this.scaleFactor = 2.0;
     this.ambientLighting = 1.0;
@@ -58,10 +62,24 @@ export class MyScene extends CGFscene {
 
     this.lights[1].setPosition(0.0, -1.0, 2.0, 1.0);
     this.lights[1].setDiffuse(1.0, 1.0, 1.0, 1.0);
-    this.lights[1].setSpecular(1.0, 1.0, 0.0, 1.0);
+    this.lights[1].setSpecular(1.0, 1.0, 1.0, 1.0);
     this.lights[1].disable();
     this.lights[1].setVisible(true);
     this.lights[1].update();
+
+    this.lights[2].setPosition(0.0, -1.0, 2.0, 1.0);
+    this.lights[2].setDiffuse(1.0, 1.0, 1.0, 1.0);
+    this.lights[2].setSpecular(1.0, 1.0, 1.0, 1.0);
+    this.lights[2].disable();
+    this.lights[2].setVisible(true);
+    this.lights[2].update();
+
+    this.lights[3].setPosition(0.0, -1.0, 2.0, 1.0);
+    this.lights[3].setDiffuse(1.0, 1.0, 1.0, 1.0);
+    this.lights[3].setSpecular(1.0, 1.0, 1.0, 1.0);
+    this.lights[3].disable();
+    this.lights[3].setVisible(true);
+    this.lights[3].update();
   }
   initCameras() {
     this.camera = new CGFcamera(0.4, 0.1, 500, vec3.fromValues(10, 10, 10), vec3.fromValues(0, 0, 0));
@@ -124,6 +142,13 @@ export class MyScene extends CGFscene {
     this.material3.setSpecular(1, 0, 0, 1.0);
     this.material3.setShininess(10.0);
 
+    // WoodColor Diffuse
+    this.material4 = new CGFappearance(this);
+    this.material4.setAmbient(0.0, 0.0, 0.0, 1.0);
+    this.material4.setDiffuse(161 / 255, 102 / 255, 47 / 255, 1.0);
+    this.material4.setSpecular(0, 0, 0, 1.0);
+    this.material4.setShininess(10.0);
+
     // Custom material (can be changed in the interface)
     // initially midrange values on ambient, diffuse and specular, on R, G and B respectively
 
@@ -137,10 +162,10 @@ export class MyScene extends CGFscene {
 
     this.updateCustomMaterial();
 
-    this.materials = [this.material1, this.material2, this.material3, this.customMaterial];
+    this.materials = [this.material1, this.material2, this.material3, this.material4, this.customMaterial];
 
     // Labels and ID's for object selection on MyInterface
-    this.materialIDs = { 'Red Ambient': 0, 'Red Diffuse': 1, 'Red Specular': 2, 'Custom': 3 };
+    this.materialIDs = { 'Red Ambient': 0, 'Red Diffuse': 1, 'Red Specular': 2, 'WoodColor Diffuse': 3, 'Custom': 4 };
   }
   display() {
     // ---- BEGIN Background, camera and axis setup
@@ -155,6 +180,8 @@ export class MyScene extends CGFscene {
 
     this.lights[0].update();
     this.lights[1].update();
+    this.lights[2].update();
+    this.lights[3].update();
 
     // Draw axis
     if (this.displayAxis)
@@ -163,6 +190,8 @@ export class MyScene extends CGFscene {
     // ---- BEGIN Primitive drawing section
 
     this.materials[this.selectedMaterial].apply();
+
+    this.tangram.neckMaterial = this.materials[this.selectedMaterial];
 
     this.pushMatrix();
     this.scale(this.scaleFactor, this.scaleFactor, this.scaleFactor);

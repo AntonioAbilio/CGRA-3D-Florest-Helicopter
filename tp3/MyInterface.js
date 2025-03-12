@@ -25,7 +25,7 @@ export class MyInterface extends CGFinterface {
         this.gui.add(this.scene, 'selectedObject', this.scene.objectIDs).name('Selected Object').onChange(this.scene.updateObjectComplexity.bind(this.scene));
 
         this.gui.add(this.scene, 'scaleFactor', 0.1, 10.0).name('Scale');
-        this.gui.add(this.scene, 'objectComplexity', 0.01, 10000.0).onChange(this.scene.updateObjectComplexity.bind(this.scene));
+        this.gui.add(this.scene, 'objectComplexity', 0.01, 1.0).onChange(this.scene.updateObjectComplexity.bind(this.scene));
 
         this.gui.add(this.scene, 'selectedMaterial', this.scene.materialIDs).name('Selected Material');
 
@@ -52,6 +52,31 @@ export class MyInterface extends CGFinterface {
         sf2.add(this.scene.lights[1], 'constant_attenuation', 0.00, 1.00).name("Const. Atten.");
         sf2.add(this.scene.lights[1], 'linear_attenuation', 0.0, 1.0).name("Linear Atten.");
         sf2.add(this.scene.lights[1], 'quadratic_attenuation', 0.0, 1.0).name("Quad. Atten.");
+
+        // similar but for light 2
+        var f2 = this.gui.addFolder('Light 2 ');
+        f2.add(this.scene.lights[2], 'enabled').name("Enabled");
+        var sf3 = f2.addFolder('Light 2 Position');
+        sf3.add(this.scene.lights[2].position, '0', -5.0, 5.0).name("X Position");
+        sf3.add(this.scene.lights[2].position, '1', -5.0, 5.0).name("Y Position");
+        sf3.add(this.scene.lights[2].position, '2', -5.0, 5.0).name("Z Position");
+        var sf4 = f2.addFolder('Light 2 Attenuation');
+        sf4.add(this.scene.lights[2], 'constant_attenuation', 0.00, 1.00).name("Const. Atten.");
+        sf4.add(this.scene.lights[2], 'linear_attenuation', 0.0, 1.0).name("Linear Atten.");
+        sf4.add(this.scene.lights[2], 'quadratic_attenuation', 0.0, 1.0).name("Quad. Atten.");
+
+        // similar but for light 3
+        var f3 = this.gui.addFolder('Light 3 ');
+        f3.add(this.scene.lights[3], 'enabled').name("Enabled");
+        var sf5 = f3.addFolder('Light 3 Position');
+        sf5.add(this.scene.lights[3].position, '0', -5.0, 5.0).name("X Position");
+        sf5.add(this.scene.lights[3].position, '1', -5.0, 5.0).name("Y Position");
+        sf5.add(this.scene.lights[3].position, '2', -5.0, 5.0).name("Z Position");
+        var sf6 = f3.addFolder('Light 3 Attenuation');
+        sf6.add(this.scene.lights[3], 'constant_attenuation', 0.00, 1.00).name("Const. Atten.");
+        sf6.add(this.scene.lights[3], 'linear_attenuation', 0.0, 1.0).name("Linear Atten.");
+        sf6.add(this.scene.lights[3], 'quadratic_attenuation', 0.0, 1.0).name("Quad. Atten.");
+
 
 
         // Anothe forlder for grouping the custom material's parameters
