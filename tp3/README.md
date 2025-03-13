@@ -40,6 +40,18 @@ this.head.display();
 
 Because most of the materials only have the specular light enabled (ambient and diffuse are set to 0) we had to create more lights and change the attenuation of the lights to allow us to take a clear picture of the tangram with the right colors.
 
+### Exercice 2
+
+In this exercice we were tasked to build a prism that could have it complexity changed.
+In the end of the exercice it was aked to make the prism have 8 sides and 20 stacks.
+This is what is shown in the picture.
+
+![Screenshot 9](screenshots/cg-t04g08-tp3-3.png)
+
+In this exercice we can see that due to the way normals are implemented the light creates a very distinct seam in between faces of the prism. Just like the picture below shows.
+
+![Screenshot 10](screenshots/extras/exercice2-extra.png)
+
 ## Notes:
 
 ### Difuse Light
