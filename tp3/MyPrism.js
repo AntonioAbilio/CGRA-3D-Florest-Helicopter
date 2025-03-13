@@ -17,25 +17,25 @@ export class MyPrism extends CGFobject {
         this.indices = [];
         this.normals = [];
 
-        var ang = 0;
+        let ang = 0;
 
         // This variable will allow us do slice the circle.
-        var alphaAng = 2 * Math.PI / this.slices;
+        let alphaAng = 2 * Math.PI / this.slices;
 
         // We know that N0 (the normal that divides the angle in two of the same)
         // TODO: (See picture in README)
-        var normalN0Angle = alphaAng / 2;
+        let normalN0Angle = alphaAng / 2;
 
-        for (var i = 0; i < this.slices; i++) {
+        for (let i = 0; i < this.slices; i++) {
             // All vertices have to be declared for a given face
             // even if they are shared with others, as the normals 
             // in each face will be different
 
-            var sa = Math.sin(ang);
-            var ca = Math.cos(ang);
+            let sa = Math.sin(ang);
+            let ca = Math.cos(ang);
 
-            var saa = Math.sin(ang + alphaAng);
-            var caa = Math.cos(ang + alphaAng);
+            let saa = Math.sin(ang + alphaAng);
+            let caa = Math.cos(ang + alphaAng);
 
             // Bottom Left
             this.vertices.push(ca, sa, 1)
@@ -50,12 +50,12 @@ export class MyPrism extends CGFobject {
             this.vertices.push(caa, saa, 1)
 
             // Calculate the coordinates for x and y of the Normal Vector.
-            var xCoords = Math.cos(normalN0Angle);
-            var yCoords = Math.sin(normalN0Angle);
+            let xCoords = Math.cos(normalN0Angle);
+            let yCoords = Math.sin(normalN0Angle);
 
 
             // Creation of the normal vector.
-            var normal = [
+            let normal = [
                 xCoords,
                 yCoords,
                 0
@@ -63,7 +63,7 @@ export class MyPrism extends CGFobject {
 
             // Vector normalization.
             // This only ensures that we are dealing with normals that have unit size.
-            var nsize = Math.sqrt(
+            let nsize = Math.sqrt(
                 normal[0] * normal[0] +
                 normal[1] * normal[1] +
                 normal[2] * normal[2]
@@ -79,7 +79,7 @@ export class MyPrism extends CGFobject {
             this.normals.push(...normal);
             this.normals.push(...normal);
 
-            var indexOffset = 3 * i
+            let indexOffset = 3 * i
 
 
             /* 
@@ -106,7 +106,58 @@ export class MyPrism extends CGFobject {
             normalN0Angle += alphaAng
         }
 
-        console.log(this.vertices)
+        ang = 0;
+        normalN0Angle = alphaAng / 2;
+
+        for (let i = 0; i < this.slices; i++) {
+
+            let increment = 0
+
+            for (let j = 0; j < this.stacks; j++) {
+
+                let sa = Math.sin(ang);
+                let ca = Math.cos(ang);
+
+                let saa = Math.sin(ang + alphaAng);
+                let caa = Math.cos(ang + alphaAng);
+
+                // Bottom Right
+                this.vertices.push(ca, sa, increment)
+
+                // Top Right
+                this.vertices.push(caa, saa, increment)
+
+                //console.log(`Created vertex ${ca}, ${sa}, ${increment}`)
+                //console.log(`Created vertex ${caa}, ${saa}, ${increment}`)
+
+                // Calculate the coordinates for x and y of the Normal Vector.
+                let xCoords = Math.cos(normalN0Angle);
+                let yCoords = Math.sin(normalN0Angle);
+
+                // Creation of the normal vector.
+                let normal = [xCoords, yCoords, 0];
+
+                // Vector normalization.
+                // This only ensures that we are dealing with normals that have unit size.
+                let nsize = Math.sqrt(
+                    normal[0] * normal[0] +
+                    normal[1] * normal[1] +
+                    normal[2] * normal[2]
+                );
+                normal[0] /= nsize;
+                normal[1] /= nsize;
+                normal[2] /= nsize;
+
+                // Push normal once for each vertex
+
+                this.normals.push(...normal);
+                this.normals.push(...normal);
+                increment += 1 / (this.stacks)
+            }
+
+            ang += alphaAng;
+            normalN0Angle += alphaAng
+        }
 
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();
