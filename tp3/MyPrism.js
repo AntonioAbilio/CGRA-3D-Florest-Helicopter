@@ -23,17 +23,17 @@ export class MyPrism extends CGFobject {
         let alphaAng = 2 * Math.PI / this.slices;
 
         // We know that N0 (the normal that divides the angle in two of the same)
-        // TODO: (See picture in README)
         let normalN0Angle = alphaAng / 2;
 
+        // We're using the trigonometric circle to calculate the point where a vertex should be.
+        // We know that coordinates can be defined using cos and sin where x = cos(angle) and y = sin(angle)
         for (let i = 0; i < this.slices; i++) {
-            // All vertices have to be declared for a given face
-            // even if they are shared with others, as the normals 
-            // in each face will be different
 
+            // The "lowest" point of the triangle is given by these coordinates.
             let sa = Math.sin(ang);
             let ca = Math.cos(ang);
 
+            // The "highest" point is given by these.
             let saa = Math.sin(ang + alphaAng);
             let caa = Math.cos(ang + alphaAng);
 
@@ -53,7 +53,6 @@ export class MyPrism extends CGFobject {
             let xCoords = Math.cos(normalN0Angle);
             let yCoords = Math.sin(normalN0Angle);
 
-
             // Creation of the normal vector.
             let normal = [
                 xCoords,
@@ -63,24 +62,18 @@ export class MyPrism extends CGFobject {
 
             // Vector normalization.
             // This only ensures that we are dealing with normals that have unit size.
-            let nsize = Math.sqrt(
-                normal[0] * normal[0] +
-                normal[1] * normal[1] +
-                normal[2] * normal[2]
-            );
+            let nsize = Math.sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
             normal[0] /= nsize;
             normal[1] /= nsize;
             normal[2] /= nsize;
 
             // Push normal once for each vertex
-
             this.normals.push(...normal);
             this.normals.push(...normal);
             this.normals.push(...normal);
             this.normals.push(...normal);
 
             let indexOffset = 3 * i
-
 
             /* 
                 i = 1
@@ -111,6 +104,8 @@ export class MyPrism extends CGFobject {
 
         for (let i = 0; i < this.slices; i++) {
 
+            // This tells us how much we need to "walk" in the Z-axis at a time.
+            // Creates the illusion of stacks.
             let increment = 0
 
             for (let j = 0; j < this.stacks; j++) {
@@ -127,9 +122,6 @@ export class MyPrism extends CGFobject {
                 // Top Right
                 this.vertices.push(caa, saa, increment)
 
-                //console.log(`Created vertex ${ca}, ${sa}, ${increment}`)
-                //console.log(`Created vertex ${caa}, ${saa}, ${increment}`)
-
                 // Calculate the coordinates for x and y of the Normal Vector.
                 let xCoords = Math.cos(normalN0Angle);
                 let yCoords = Math.sin(normalN0Angle);
@@ -139,17 +131,12 @@ export class MyPrism extends CGFobject {
 
                 // Vector normalization.
                 // This only ensures that we are dealing with normals that have unit size.
-                let nsize = Math.sqrt(
-                    normal[0] * normal[0] +
-                    normal[1] * normal[1] +
-                    normal[2] * normal[2]
-                );
+                let nsize = Math.sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
                 normal[0] /= nsize;
                 normal[1] /= nsize;
                 normal[2] /= nsize;
 
                 // Push normal once for each vertex
-
                 this.normals.push(...normal);
                 this.normals.push(...normal);
                 increment += 1 / (this.stacks)
