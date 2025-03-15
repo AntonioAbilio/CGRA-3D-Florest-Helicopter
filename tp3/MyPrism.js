@@ -75,18 +75,7 @@ export class MyPrism extends CGFobject {
 
             let indexOffset = 3 * i
 
-            /* 
-                i = 1
-
-                (Expected indexes)
-                    4, 5, 6,
-                    6, 7, 4
-                
-                (Actual indexes)
-                    1, 2, 3,
-                    3, 4, 1
-            */
-
+            // IndexOffset lets us access the new elements.
             this.indices.push(indexOffset + i, indexOffset + i + 1, indexOffset + i + 2);
             this.indices.push(indexOffset + i + 2, indexOffset + i + 3, indexOffset + i);
 

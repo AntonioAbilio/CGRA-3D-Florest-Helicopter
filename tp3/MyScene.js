@@ -3,6 +3,7 @@ import { MyPyramid } from "./MyPyramid.js";
 import { MyCone } from "./MyCone.js";
 import { MyPlane } from "./MyPlane.js";
 import { MyPrism } from "./MyPrism.js";
+import { MyCylinder } from "./MyCylinder.js";
 import { MyTangram } from "./Objects/MyTangram.js";
 import { MyUnitCube } from "./Objects/MyUnitCube.js";
 
@@ -33,20 +34,22 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 5);
     this.cone = new MyCone(this, 3, 1);
     this.pyramid = new MyPyramid(this, 3, 1);
-    this.prism = new MyPrism(this, 8, 20);
     this.tangram = new MyTangram(this);
     this.unitcube = new MyUnitCube(this);
+    this.prism = new MyPrism(this, 8, 20);
+    this.cylinder = new MyCylinder(this, 3, 1);
 
-    this.objects = [this.plane, this.pyramid, this.cone, this.tangram, this.unitcube, this.prism];
+
+    this.objects = [this.plane, this.pyramid, this.cone, this.tangram, this.unitcube, this.prism, this.cylinder];
 
     // Labels and ID's for object selection on MyInterface
-    this.objectIDs = { 'Plane': 0, 'Pyramid': 1, 'Cone': 2, 'Tangram': 3, 'UnitCube': 4, 'Prism': 5 };
+    this.objectIDs = { 'Plane': 0, 'Pyramid': 1, 'Cone': 2, 'Tangram': 3, 'UnitCube': 4, 'Prism': 5, 'Cylinder': 6 };
 
     //Other variables connected to MyInterface
-    this.selectedObject = 5;
-    this.selectedMaterial = 2;
+    this.selectedObject = 6;
+    this.selectedMaterial = 0;
     this.displayAxis = true;
-    this.displayNormals = false;
+    this.displayNormals = true;
     this.objectComplexity = 0.5;
     this.scaleFactor = 2.0;
     this.ambientLighting = 1.0;
@@ -58,28 +61,28 @@ export class MyScene extends CGFscene {
     this.lights[0].setPosition(0.4, 2.7, -1.2, 1.0);
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[0].setSpecular(1.0, 1.0, 1.0, 1.0);
-    this.lights[0].enable();
+    this.lights[0].disable();
     this.lights[0].setVisible(true);
     this.lights[0].update();
 
     this.lights[1].setPosition(3, 2.2, -0.1, 1.0);
     this.lights[1].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[1].setSpecular(1.0, 1.0, 1.0, 1.0);
-    this.lights[1].enable();
+    this.lights[1].disable();
     this.lights[1].setVisible(true);
     this.lights[1].update();
 
     this.lights[2].setPosition(0.0, -1.0, 2.0, 1.0);
     this.lights[2].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[2].setSpecular(1.0, 1.0, 1.0, 1.0);
-    this.lights[2].enable();
+    this.lights[2].disable();
     this.lights[2].setVisible(true);
     this.lights[2].update();
 
     this.lights[3].setPosition(0.0, -1.0, 2.0, 1.0);
     this.lights[3].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[3].setSpecular(1.0, 1.0, 1.0, 1.0);
-    this.lights[3].enable();
+    this.lights[3].disable();
     this.lights[3].setVisible(true);
     this.lights[3].update();
   }
