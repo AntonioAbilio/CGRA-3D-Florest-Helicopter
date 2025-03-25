@@ -1,5 +1,6 @@
 import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture } from "../lib/CGF.js";
 import { MyQuad } from "./MyQuad.js";
+import { MyUnitCubeQuad } from "./MyUnitCubeQuad.js";
 import { MyTangram } from "./Objects/MyTangram.js";
 
 /**
@@ -36,7 +37,7 @@ export class MyScene extends CGFscene {
         this.quadMaterial.setDiffuse(0.9, 0.9, 0.9, 1);
         this.quadMaterial.setSpecular(0.1, 0.1, 0.1, 1);
         this.quadMaterial.setShininess(10.0);
-        this.quadMaterial.loadTexture('images/tangram-lines.png');
+        this.quadMaterial.loadTexture('images/tangram.png');
         this.quadMaterial.setTextureWrap('REPEAT', 'REPEAT');
         //------
 
@@ -44,7 +45,13 @@ export class MyScene extends CGFscene {
         this.texture1 = new CGFtexture(this, 'images/board.jpg');
         this.texture2 = new CGFtexture(this, 'images/floor.png');
         this.texture3 = new CGFtexture(this, 'images/window.jpg');
+        this.topTexture = new CGFtexture(this, 'images/mineTop.png');
+        this.sideTexture = new CGFtexture(this, 'images/mineSide.png');
+        this.botTexture = new CGFtexture(this, 'images/mineBottom.png');
         //-------
+
+        // Cube
+        this.myCubeQuad = new MyUnitCubeQuad(this, this.topTexture, this.sideTexture, this.sideTexture, this.sideTexture, this.sideTexture, this.botTexture);
 
         //-------Objects connected to MyInterface
         this.displayAxis = true;
@@ -52,6 +59,9 @@ export class MyScene extends CGFscene {
         this.selectedTexture = -1;
         this.wrapS = 0;
         this.wrapT = 0;
+        this.showTangram = false;
+        this.showMineCube = true;
+        this.useLinear = false;
 
         this.textures = [this.texture1, this.texture2, this.texture3];
         this.texCoords = [0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0];
@@ -127,7 +137,18 @@ export class MyScene extends CGFscene {
 
         // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
 
-        this.tangram.display();
+        if (this.showTangram) {
+            this.tangram.display();
+        }
+
+        if (this.showMineCube) {
+            if (this.useLinear) {
+                this.myCubeQuad.changeTexFiltering(this.gl.LINEAR);
+            } else {
+                this.myCubeQuad.changeTexFiltering(this.gl.NEAREST);
+            }
+            this.myCubeQuad.display();
+        }
 
         // ---- END Primitive drawing section
     }
