@@ -13,6 +13,7 @@ export class MySphere extends CGFobject {
         this.slices = slices;
         this.stacks = stacks;
         this.radius = radius;
+        this.center = [0, 0, 0]
         this.initBuffers();
     }
 
@@ -42,7 +43,7 @@ export class MySphere extends CGFobject {
                 this.vertices.push(x * this.radius, y * this.radius, z * this.radius);
 
                 // Normal vector (unit vector, not scaled)
-                this.normals.push(x, y, z);
+                this.normals.push(-x, -y, -z);
 
                 // Texture coordinates
                 this.texCoords.push(longNumber / this.slices, latNumber / this.stacks);
@@ -59,9 +60,6 @@ export class MySphere extends CGFobject {
                 this.indices.push(first, second, first + 1);
                 this.indices.push(second, second + 1, first + 1);
 
-                // Create the oposite face for the sphere
-                this.indices.push(first + 1, second, first);
-                this.indices.push(first + 1, second + 1, second);
             }
         }
 

@@ -26,6 +26,16 @@ export class MyInterface extends CGFinterface {
         // create reference from the scene to the GUI
         this.scene.gui = this;
 
+        this.gui.add(this.scene, 'displayAxis').name("Display axis");
+
+        this.gui.add(this.scene, 'displayNormals').name("Display normals");
+
+        var f0 = this.gui.addFolder('Tree Settings');
+        f0.add(this.scene, 'rotationAxis').name("X Rotation");
+        f0.add(this.scene, 'inclination').name("Inclination");
+        f0.add(this.scene, 'trunkRadius').name("Trunk Radius");
+        f0.addColor(this.scene, 'leavesRGB').name("Leaves Color");
+
         // disable the processKeyboard function
         this.processKeyboard = function () { };
 
