@@ -1,10 +1,10 @@
 import { CGFscene, CGFcamera, CGFaxis, CGFtexture } from "../lib/CGF.js";
 import { MySphere } from "./MySphere.js";
 import { MyPlane } from "./MyPlane.js";
-import { getTranslationMatrix, getYRotationMatrix } from './utils/utils.js';
+import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
 import { MyBuilding } from './MyBuilding.js';
 import { MyPanorama } from "./MyPanorama.js";
-import { MyTree } from "./MyTree.js";
+import { MyTree } from "./tree/MyTree.js";
 
 
 /**
@@ -32,10 +32,13 @@ export class MyScene extends CGFscene {
     // Interface items
     this.displayAxis = false;
     this.displayNormals = false;
+
+    // Tree Settings
+    this.treeSize = 80;
     this.inclination = 0;
     this.rotationAxis = false;
     this.trunkRadius = 10;
-    this.leavesRGB = 0xffffff;
+    this.leavesRGB = 0x184632;
 
     this.enableTextures(true);
 
@@ -43,11 +46,12 @@ export class MyScene extends CGFscene {
 
     //Initialize scene objects
     this.axis = new CGFaxis(this, 20, 1);
-    this.plane = new MyPlane(this, 64);
+    this.plane = new MyPlane(this, 200);
     this.building = new MyBuilding(this, [0, 0, 0]);
 
     // TODO: remove and substitute for florest
-    this.tree = new MyTree(this, 6, 1, 20, this.inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
+
+    this.tree = new MyTree(this, this.treeSize, this.inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
     this.panorama = new MyPanorama(this, new CGFtexture(this, "textures/panorama.jpg"));
 
     // Initialize some textures
@@ -62,7 +66,7 @@ export class MyScene extends CGFscene {
   }
   initCameras() {
     this.camera = new CGFcamera(
-      0.9,
+      1.5,
       0.9,
       1000,
       vec3.fromValues(0, 80, 0),
@@ -98,6 +102,18 @@ export class MyScene extends CGFscene {
     this.setShininess(10.0);
   }
 
+  updateAmountOfLeaves(newSize) {
+    this.tree.updateAmountOfLeaves(newSize)
+  }
+
+  updateTrunkRadius(newRadius) {
+    this.tree.updateTrunkRadius(newRadius);
+  }
+
+  updateLeavesColors(hexColor) {
+    this.tree.updateLeavesColors(hexColor);
+  }
+
   display() {
     // ---- BEGIN Background, camera and axis setup
     // Clear image and depth buffer everytime we update the scene
@@ -113,6 +129,10 @@ export class MyScene extends CGFscene {
     if (this.displayAxis)
       this.axis.display();
 
+    if (this.camera.position[1] < 0.0) {
+      this.camera.position[1] = 0.0;
+    }
+
     this.setDefaultAppearance();
 
     this.building.initBuffers();
@@ -124,21 +144,15 @@ export class MyScene extends CGFscene {
     this.panorama.display();
     this.popMatrix();
 
-    this.building.display();
-
-    if (this.camera.position[1] < 0.0) {
-      this.camera.position[1] = 0.0;
-    }
-
-    //this.tree.display();
-
-
-    this.scale(400, 1, 400);
-
+    this.pushMatrix();
+    this.scale(400, 400, 400);
     this.rotate(-Math.PI / 2, 1, 0, 0);
-
     this.grass.bind();
     this.plane.display();
+    this.popMatrix()
+
+    this.building.display();
+    this.tree.display();
 
 
   }

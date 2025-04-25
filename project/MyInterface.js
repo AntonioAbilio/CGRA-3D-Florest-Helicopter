@@ -33,8 +33,9 @@ export class MyInterface extends CGFinterface {
         var f0 = this.gui.addFolder('Tree Settings');
         f0.add(this.scene, 'rotationAxis').name("X Rotation");
         f0.add(this.scene, 'inclination').name("Inclination");
-        f0.add(this.scene, 'trunkRadius').name("Trunk Radius");
-        f0.addColor(this.scene, 'leavesRGB').name("Leaves Color");
+        f0.add(this.scene, 'trunkRadius', 1, 10).name("Trunk Radius").onChange(this.scene.updateTrunkRadius.bind(this.scene));
+        f0.add(this.scene, 'treeSize', 30, 80).name("Tree Size").onChange(this.scene.updateAmountOfLeaves.bind(this.scene));
+        f0.addColor(this.scene, 'leavesRGB').name("Leaves Color").onChange(this.scene.updateLeavesColors.bind(this.scene));
 
         // disable the processKeyboard function
         this.processKeyboard = function () { };

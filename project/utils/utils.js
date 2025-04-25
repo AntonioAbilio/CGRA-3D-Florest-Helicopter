@@ -47,3 +47,12 @@ export function getTranslationMatrix(xOffset, yOffset, zOffset) {
         xOffset, yOffset, zOffset, 1
     ]
 }
+
+export function getScalingMatrix(xOffset, yOffset, zOffset) {
+    return [
+        xOffset, 0, 0, 0,
+        0, yOffset, 0, 0,
+        0, 0, zOffset, 0,
+        0, 0, 0, 1
+    ]
+}
