@@ -42,9 +42,7 @@ export class MyBuilding extends CGFobject {
         this.initializeWindowProperties();
     }
     
-    /**
-     * Initialize properties for window sizing and placement
-     */
+
     initializeWindowProperties() {
         // Calculate floor height
         this.floorHeight = this.height / this.floors;
@@ -58,12 +56,7 @@ export class MyBuilding extends CGFobject {
         this.windowMarginY = this.floorHeight * 0.2;
     }
 
-    /**
-     * Display a window at a specific position on the building
-     * @param x - X position relative to building center
-     * @param y - Y position relative to building center
-     * @param z - Z position (usually half of building depth plus a small offset)
-     */
+   
     displayWindow(x, y, z) {
         this.scene.pushMatrix();
         this.scene.translate(x, y, z);
@@ -72,11 +65,9 @@ export class MyBuilding extends CGFobject {
         this.scene.popMatrix();
     }
     
-    /**
-     * Display windows on a face of the building (front or back)
-     * @param isFront - Whether this is the front face (true) or back face (false)
-     */
+
     displayFaceWindows(isFront) {
+
         // Position for the front face
         const posZ = isFront ? this.depth/2 + 0.01 : -this.depth/2 - 0.01;
         // Rotation for the back face (if not front)
@@ -120,10 +111,6 @@ export class MyBuilding extends CGFobject {
         this.scene.popMatrix();
     }
     
-    /**
-     * Display windows on the side faces of the building
-     * @param isRight - Whether this is the right face (true) or left face (false)
-     */
     displaySideWindows(isRight) {
         // Position for the side face
         const posX = isRight ? this.width/2 + 0.01 : -this.width/2 - 0.01;

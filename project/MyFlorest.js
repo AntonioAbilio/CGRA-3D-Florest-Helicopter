@@ -20,26 +20,11 @@ export class MyFlorest extends CGFobject {
         // Generate random positions and parameters for trees
         this.trees = [];
         this.treePositions = [];
-        let x = 0;
-        let z = 0;
-        let spacing = 10;
-        for (let row = 0; row < this.num_lines; row++) {
-            for (let col = 0; col < this.num_columns; col++) {
 
-                x += Math.random() + spacing;
-
-                // Store the tree and its position
-                this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, 0 + (10 * Math.random()), 0 + (10 * Math.random()), 1, 0x184632));
-                this.treePositions.push({
-                    x: x,
-                    z: z
-                });
-            }
-            x = 0;
-            z += spacing;
-        }
+        this.updateColumns(num_columns);
 
     }
+
 
     display() {
         // Display each tree
@@ -66,17 +51,17 @@ export class MyFlorest extends CGFobject {
         for (let row = 0; row < this.num_lines; row++) {
             for (let col = 0; col < this.num_columns; col++) {
 
-                x += Math.random() + spacing;
+                x += Math.max(Math.random() * spacing, 4);
 
                 // Store the tree and its position
-                this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, 0 + (10 * Math.random()), 0 + (10 * Math.random()), 1, 0x184632));
+                this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632));
                 this.treePositions.push({
                     x: x,
                     z: z
                 });
             }
             x = 0;
-            z += spacing;
+            z += Math.max(Math.random() * spacing, 4);
         }
     }
 
@@ -91,17 +76,17 @@ export class MyFlorest extends CGFobject {
         for (let row = 0; row < this.num_lines; row++) {
             for (let col = 0; col < this.num_columns; col++) {
 
-                x += Math.random() + spacing;
+                x += Math.max(Math.random() * spacing, 4);
 
                 // Store the tree and its position
-                this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, 0 + (10 * Math.random()), 0 + (10 * Math.random()), 1, 0x184632));
+                this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632));
                 this.treePositions.push({
                     x: x,
                     z: z
                 });
             }
             x = 0;
-            z += spacing;
+            z += Math.max(Math.random() * spacing, 4);
         }
     }
 }

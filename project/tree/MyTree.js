@@ -6,9 +6,10 @@ import { MyTrunk } from './MyTrunk.js';
 /**
 * MyTree
 * @constructor
- * @param scene - Reference to MyScene object
- * @param slices - number of divisions around the Y axis
- * @param stacks - number of divisions along the Y axis
+ * @param treeSize - Reference to MyScene object
+ * @param X_inclination - number of divisions around the Y axis
+ * @param Z_inclination - number of divisions along the Y axis
+ * @param trunkRadius - number of divisions along the Y axis
 */
 export class MyTree extends CGFobject {
     constructor(scene, treeSize, X_inclination, Z_inclination, trunkRadius, leavesRGB) {
