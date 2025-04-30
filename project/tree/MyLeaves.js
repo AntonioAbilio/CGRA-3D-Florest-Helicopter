@@ -1,4 +1,4 @@
-import { CGFobject } from '../../lib/CGF.js';
+import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 /**
 * MyLeaves
 * @constructor
@@ -12,15 +12,24 @@ export class MyLeaves extends CGFobject {
         this.leavesRGB = leavesRGB;
         this.radius = radius;
 
+        // Texture for leaves.
+        this.leaves = new CGFappearance(this.scene);
+        this.leaves.setAmbient(0.1, 0.1, 0.1, 1);
+        this.leaves.setDiffuse(0.9, 0.9, 0.9, 1);
+        this.leaves.setSpecular(0.1, 0.1, 0.1, 1);
+        this.leaves.setShininess(10.0);
+        this.leaves.loadTexture('textures/leaves.jpg');
+        this.leaves.setTextureWrap('REPEAT', 'REPEAT');
 
         // Pyramid / Leaves Z Size
-        this.z_size = 16;
+        this.z_size = 2;
         this.initBuffers();
     }
     initBuffers() {
         this.vertices = [];
         this.indices = [];
         this.normals = [];
+        this.texCoords = []; // Add this line to create the texCoords array
 
         var ang = 0;
         var alphaAng = 2 * Math.PI / this.slices;
@@ -62,6 +71,13 @@ export class MyLeaves extends CGFobject {
             this.normals.push(...normal);
             this.normals.push(...normal);
 
+            // Add texture coordinates for side faces
+            // Map the tip to the middle top of the texture
+            this.texCoords.push(0.5, 0.0);
+            // Map the base corners to the bottom of the texture
+            this.texCoords.push((i / this.slices), 1.0);
+            this.texCoords.push(((i + 1) / this.slices), 1.0);
+
             this.indices.push(3 * i, (3 * i + 1), (3 * i + 2));
 
             ang += alphaAng;
@@ -87,6 +103,13 @@ export class MyLeaves extends CGFobject {
             this.normals.push(0, -1, 0);
             this.normals.push(0, -1, 0);
 
+            // Add texture coordinates for the bottom face
+            // Center point maps to center of texture
+            this.texCoords.push(0.5, 0.5);
+            // Circumference points map based on angle
+            this.texCoords.push(0.5 + 0.5 * Math.cos(ang), 0.5 + 0.5 * Math.sin(ang));
+            this.texCoords.push(0.5 + 0.5 * Math.cos(ang + alphaAng), 0.5 + 0.5 * Math.sin(ang + alphaAng));
+
             // Note the reversed winding order for the bottom face
             this.indices.push(baseVertexCount + 3 * i + 2,
                 baseVertexCount + 3 * i + 1,
@@ -97,6 +120,24 @@ export class MyLeaves extends CGFobject {
 
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();
+    }
+
+
+    display() {
+        if (this.leaves.texture) {
+            this.leaves.apply();
+        }
+        super.display();
+    }
+
+    /**
+     * @method updateTexCoords
+     * Updates the list of texture coordinates
+     * @param {Array} coords - Array of texture coordinates
+     */
+    updateTexCoords(coords) {
+        this.texCoords = [...coords];
+        this.updateTexCoordsGLBuffers();
     }
 
     /**

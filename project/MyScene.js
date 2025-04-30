@@ -1,10 +1,11 @@
-import { CGFscene, CGFcamera, CGFaxis, CGFtexture } from "../lib/CGF.js";
+import { CGFscene, CGFappearance, CGFcamera, CGFaxis, CGFtexture } from "../lib/CGF.js";
 import { MySphere } from "./MySphere.js";
 import { MyPlane } from "./MyPlane.js";
 import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
 import { MyBuilding } from './MyBuilding.js';
 import { MyPanorama } from "./MyPanorama.js";
 import { MyTree } from "./tree/MyTree.js";
+import { MyFlorest } from "./MyFlorest.js";
 
 
 /**
@@ -34,10 +35,11 @@ export class MyScene extends CGFscene {
     this.displayNormals = false;
 
     // Tree Settings
-    this.treeSize = 80;
-    this.inclination = 0;
+    this.treeSize = 10;
+    this.X_inclination = 0.0;
+    this.Z_inclination = 0.0;
     this.rotationAxis = false;
-    this.trunkRadius = 10;
+    this.trunkRadius = 1.5;
     this.leavesRGB = 0x184632;
 
     this.enableTextures(true);
@@ -51,11 +53,19 @@ export class MyScene extends CGFscene {
 
     // TODO: remove and substitute for florest
 
-    this.tree = new MyTree(this, this.treeSize, this.inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
+    this.displayTree = false;
+    this.tree = new MyTree(this, this.treeSize, this.X_inclination, this.Z_inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
+
+    this.forestLines = 5;
+    this.forestColumns = 4;
+    this.florest = new MyFlorest(this, this.forestLines, this.forestColumns);
     this.panorama = new MyPanorama(this, new CGFtexture(this, "textures/panorama.jpg"));
 
     // Initialize some textures
     this.grass = new CGFtexture(this, "textures/grass.jpg");
+    this.appearance = new CGFappearance(this);
+    this.appearance.setTexture(this.grass);
+    this.appearance.setTextureWrap('REPEAT', 'REPEAT');
 
   }
   initLights() {
@@ -66,11 +76,11 @@ export class MyScene extends CGFscene {
   }
   initCameras() {
     this.camera = new CGFcamera(
-      1.5,
+      0.6,
       0.9,
       1000,
-      vec3.fromValues(0, 80, 0),
-      vec3.fromValues(30, 0, 0)
+      vec3.fromValues(10, 80, 10),
+      vec3.fromValues(20, 0, 20)
     );
   }
   checkKeys() {
@@ -114,6 +124,25 @@ export class MyScene extends CGFscene {
     this.tree.updateLeavesColors(hexColor);
   }
 
+  updateTreeXInclination(inclination) {
+    this.tree.updateXInclination(inclination);
+  }
+
+  updateTreeZInclination(inclination) {
+    this.tree.updateZInclination(inclination);
+  }
+
+  updateForestLines(numLines) {
+    this.forestLines = numLines;
+    this.florest.updateLines(numLines);
+  }
+
+  updateForestColumns(numCols) {
+    this.forestColumns = numCols;
+    this.florest.updateColumns(numCols);
+  }
+
+
   display() {
     // ---- BEGIN Background, camera and axis setup
     // Clear image and depth buffer everytime we update the scene
@@ -144,16 +173,26 @@ export class MyScene extends CGFscene {
     this.panorama.display();
     this.popMatrix();
 
-    this.pushMatrix();
-    this.scale(400, 400, 400);
-    this.rotate(-Math.PI / 2, 1, 0, 0);
-    this.grass.bind();
-    this.plane.display();
-    this.popMatrix()
 
     this.building.display();
-    this.tree.display();
 
+    if (this.displayTree) {
+      this.tree.display();
+    }
+
+    this.pushMatrix();
+    this.multMatrix(getYRotationMatrix(90))
+    this.multMatrix(getTranslationMatrix(0, 0, 0));
+    this.florest.display();
+    this.popMatrix()
+
+    this.scale(400, 1, 400);
+    this.rotate(-Math.PI / 2, 1, 0, 0);
+
+    this.pushMatrix();
+    this.appearance.apply();
+    this.plane.display();
+    this.popMatrix();
 
   }
 }
