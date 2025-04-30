@@ -1,4 +1,4 @@
-import {CGFobject} from '../lib/CGF.js';
+import { CGFobject, CGFtexture } from "../lib/CGF.js";
 /**
 * MyPlane
 * @constructor
@@ -23,6 +23,9 @@ export class MyPlane extends CGFobject {
 		this.q = (this.maxS - this.minS) / this.nrDivs;
 		this.w = (this.maxT - this.minT) / this.nrDivs;
 		this.initBuffers();
+
+		// Initialize some textures
+		this.grass = new CGFtexture(this.scene, "textures/grass.jpg");
 	}
 	initBuffers() {
 		// Generate vertices, normals, and texCoords
@@ -59,13 +62,12 @@ export class MyPlane extends CGFobject {
 		this.initGLBuffers();
 	}
 
-	setFillMode() { 
-		this.primitiveType=this.scene.gl.TRIANGLE_STRIP;
+	setFillMode() {
+		this.primitiveType = this.scene.gl.TRIANGLE_STRIP;
 	}
 
-	setLineMode() 
-	{ 
-		this.primitiveType=this.scene.gl.LINES;
+	setLineMode() {
+		this.primitiveType = this.scene.gl.LINES;
 	};
 
 }

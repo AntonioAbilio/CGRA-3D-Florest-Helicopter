@@ -1,10 +1,11 @@
-import { CGFscene, CGFcamera, CGFaxis, CGFtexture } from "../lib/CGF.js";
+import { CGFscene, CGFappearance, CGFcamera, CGFaxis, CGFtexture } from "../lib/CGF.js";
 import { MySphere } from "./MySphere.js";
 import { MyPlane } from "./MyPlane.js";
-import { getTranslationMatrix, getYRotationMatrix } from './utils/utils.js';
+import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
 import { MyBuilding } from './MyBuilding.js';
 import { MyPanorama } from "./MyPanorama.js";
-import { MyTree } from "./MyTree.js";
+import { MyTree } from "./tree/MyTree.js";
+import { MyFlorest } from "./MyFlorest.js";
 
 /**
  * MyScene
@@ -28,15 +29,30 @@ export class MyScene extends CGFscene {
 
     this.displayAxis = false;
     this.displayNormals = false;
-    this.inclination = 0;
+
+    // Tree Settings
+    this.treeSize = 10;
+    this.X_inclination = 0.0;
+    this.Z_inclination = 0.0;
     this.rotationAxis = false;
-    this.trunkRadius = 10;
-    this.leavesRGB = 0xffffff;
+    this.trunkRadius = 1.5;
+    this.leavesRGB = 0x184632;
 
     this.enableTextures(true);
     this.setUpdatePeriod(50);
 
     this.axis = new CGFaxis(this, 20, 1);
+    this.plane = new MyPlane(this, 200);
+    this.building = new MyBuilding(this, [0, 0, 0]);
+
+    // TODO: remove and substitute for florest
+
+    this.displayTree = false;
+    this.tree = new MyTree(this, this.treeSize, this.X_inclination, this.Z_inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
+
+    this.forestLines = 5;
+    this.forestColumns = 4;
+    this.florest = new MyFlorest(this, this.forestLines, this.forestColumns);
     this.plane = new MyPlane(this, 64);
 
     this.buildingTopTexture = new CGFtexture(this, "textures/buildingTop.png");
@@ -76,6 +92,10 @@ export class MyScene extends CGFscene {
     this.panorama = new MyPanorama(this, new CGFtexture(this, "textures/panorama.jpg"));
 
     this.grass = new CGFtexture(this, "textures/grass.jpg");
+    this.appearance = new CGFappearance(this);
+    this.appearance.setTexture(this.grass);
+    this.appearance.setTextureWrap('REPEAT', 'REPEAT');
+
   }
 
   initLights() {
@@ -86,7 +106,13 @@ export class MyScene extends CGFscene {
   }
 
   initCameras() {
-    this.camera = new CGFcamera(0.9, 0.9, 1000, vec3.fromValues(0, 80, 0), vec3.fromValues(30, 0, 0));
+    this.camera = new CGFcamera(
+      0.6,
+      0.9,
+      1000,
+      vec3.fromValues(10, 80, 10),
+      vec3.fromValues(20, 0, 20)
+    );
   }
 
   checkKeys() {
@@ -114,6 +140,37 @@ export class MyScene extends CGFscene {
     this.setShininess(10.0);
   }
 
+  updateAmountOfLeaves(newSize) {
+    this.tree.updateAmountOfLeaves(newSize)
+  }
+
+  updateTrunkRadius(newRadius) {
+    this.tree.updateTrunkRadius(newRadius);
+  }
+
+  updateLeavesColors(hexColor) {
+    this.tree.updateLeavesColors(hexColor);
+  }
+
+  updateTreeXInclination(inclination) {
+    this.tree.updateXInclination(inclination);
+  }
+
+  updateTreeZInclination(inclination) {
+    this.tree.updateZInclination(inclination);
+  }
+
+  updateForestLines(numLines) {
+    this.forestLines = numLines;
+    this.florest.updateLines(numLines);
+  }
+
+  updateForestColumns(numCols) {
+    this.forestColumns = numCols;
+    this.florest.updateColumns(numCols);
+  }
+
+
   display() {
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
@@ -122,6 +179,10 @@ export class MyScene extends CGFscene {
     this.applyViewMatrix();
 
     if (this.displayAxis) this.axis.display();
+
+    if (this.camera.position[1] < 0.0) {
+      this.camera.position[1] = 0.0;
+    }
 
     this.setDefaultAppearance();
     
@@ -135,6 +196,7 @@ export class MyScene extends CGFscene {
     this.multMatrix(trMatrix);
     this.panorama.display();
     this.popMatrix();
+
 
     // Display center tall building
     this.pushMatrix();
@@ -159,12 +221,25 @@ export class MyScene extends CGFscene {
 
     if (this.camera.position[1] < 0.0) this.camera.position[1] = 0.0;
 
+    if (this.displayTree) {
+      this.tree.display();
+    }
+
+    this.pushMatrix();
+    this.multMatrix(getYRotationMatrix(90))
+    this.multMatrix(getTranslationMatrix(0, 0, 0));
+    this.florest.display();
+    this.popMatrix()
+
     // Display ground
     this.pushMatrix();
     this.scale(400, 1, 400);
     this.rotate(-Math.PI / 2, 1, 0, 0);
-    this.grass.bind();
+
+    this.pushMatrix();
+    this.appearance.apply();
     this.plane.display();
     this.popMatrix();
+
   }
 }

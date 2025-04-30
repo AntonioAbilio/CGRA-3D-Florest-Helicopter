@@ -30,11 +30,20 @@ export class MyInterface extends CGFinterface {
 
         this.gui.add(this.scene, 'displayNormals').name("Display normals");
 
+        // Tree folder
         var f0 = this.gui.addFolder('Tree Settings');
-        f0.add(this.scene, 'rotationAxis').name("X Rotation");
-        f0.add(this.scene, 'inclination').name("Inclination");
-        f0.add(this.scene, 'trunkRadius').name("Trunk Radius");
-        f0.addColor(this.scene, 'leavesRGB').name("Leaves Color");
+        f0.add(this.scene, 'displayTree').name("Display tree");
+        f0.add(this.scene, 'X_inclination', -90, 90).name("X Inclination").onChange(this.scene.updateTreeXInclination.bind(this.scene))
+        f0.add(this.scene, 'Z_inclination', -90, 90).name("Z Inclination").onChange(this.scene.updateTreeZInclination.bind(this.scene))
+        f0.add(this.scene, 'trunkRadius', 1, 2).name("Trunk Radius").onChange(this.scene.updateTrunkRadius.bind(this.scene));
+        f0.add(this.scene, 'treeSize', 2, 10).name("Tree Size").onChange(this.scene.updateAmountOfLeaves.bind(this.scene));
+        f0.addColor(this.scene, 'leavesRGB').name("Leaves Color").onChange(this.scene.updateLeavesColors.bind(this.scene));
+
+        // Forest Settings folder
+        var f1 = this.gui.addFolder('Forest Settings');
+        f1.add(this.scene, 'forestLines', 4, 10).name("Number of Lines").onChange(this.scene.updateForestLines.bind(this.scene));
+        f1.add(this.scene, 'forestColumns', 5, 10).name("Number of Columns").onChange(this.scene.updateForestColumns.bind(this.scene));
+
 
         // disable the processKeyboard function
         this.processKeyboard = function () { };
