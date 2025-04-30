@@ -1,183 +1,223 @@
-import { CGFobject } from '../lib/CGF.js';
+import { CGFobject, CGFappearance } from '../lib/CGF.js';
+import { MyQuad } from './MyQuad.js';
 import { MyWindow } from './MyWindow.js';
+import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
 
 /**
- * MyQuad
+ * MyBuilding
  * @constructor
- * @param {MyScene} scene - Reference to MyScene object
- * @param {Array} coords - Array of texture coordinates (optional)
+ * @param scene - Reference to MyScene object
+ * @param topTexture - Texture for the top face
+ * @param frontTexture - Texture for the front face
+ * @param sideTexture - Texture for the side faces
+ * @param windowTexture - Texture for windows (new parameter)
+ * @param floors - Number of floors (new parameter)
+ * @param width - Width of the building (defaults to 10)
+ * @param height - Height of the building (defaults to 20)
+ * @param depth - Depth of the building (defaults to 10)
  */
 export class MyBuilding extends CGFobject {
-	constructor(scene, coords) {
-		super(scene);
-		this.windows = []
+    constructor(scene, topTexture, frontTexture, sideTexture, windowTexture, floors = 4, entrance = false, width = 10, height = 10, depth = 10) {
+        super(scene);
+        
+        this.quad = new MyQuad(scene);
+        this.topTexture = topTexture;
+        this.frontTexture = frontTexture;
+        this.sideTexture = sideTexture;
+        this.windowTexture = windowTexture;
+        
+        this.floors = floors;
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
 
-		for (let i = 0; i < 18; i++) {
-			this.windows.push(new MyWindow(scene))
-		}
+		this.entrance = entrance;
+        
+        this.textureFiltering = this.scene.gl.NEAREST; // Default texture filtering
+        
+        // Create the window object
+        this.window = new MyWindow(scene, windowTexture);
+        
+        // Initialize window properties
+        this.initializeWindowProperties();
+    }
+    
+    /**
+     * Initialize properties for window sizing and placement
+     */
+    initializeWindowProperties() {
+        // Calculate floor height
+        this.floorHeight = this.height / this.floors;
+        
+        // Window dimensions - proportional to building size
+        this.windowWidth = this.width * 0.2;
+        this.windowHeight = this.floorHeight * 0.6;
+        
+        // Window spacing from the edges
+        this.windowMarginX = this.width * 0.1;
+        this.windowMarginY = this.floorHeight * 0.2;
+    }
 
-		this.initBuffers();
-	}
+    /**
+     * Display a window at a specific position on the building
+     * @param x - X position relative to building center
+     * @param y - Y position relative to building center
+     * @param z - Z position (usually half of building depth plus a small offset)
+     */
+    displayWindow(x, y, z) {
+        this.scene.pushMatrix();
+        this.scene.translate(x, y, z);
+        this.scene.scale(this.windowWidth, this.windowHeight, 1);
+        this.window.display();
+        this.scene.popMatrix();
+    }
+    
+    /**
+     * Display windows on a face of the building (front or back)
+     * @param isFront - Whether this is the front face (true) or back face (false)
+     */
+    displayFaceWindows(isFront) {
+        // Position for the front face
+        const posZ = isFront ? this.depth/2 + 0.01 : -this.depth/2 - 0.01;
+        // Rotation for the back face (if not front)
+        const rotation = isFront ? 0 : Math.PI;
+        
+        // Calculate left and right positions for windows
+        const leftQuarterX = -this.width/4;
+        const rightQuarterX = this.width/4;
+        
+        this.scene.pushMatrix();
+        
+        // Apply rotation if this is the back face
+        if (!isFront) {
+            this.scene.rotate(rotation, 0, 1, 0);
+        }
+        
+        // Calculate center position for the first floor
+        const firstFloorY = -this.height/2 + this.floorHeight/2;
+        
+        // Place windows on each floor
+        for (let floor = 0; floor < this.floors; floor++) {
 
-	initBuffers() {
-		this.vertices = [];
-		this.normals = [];
-		this.indices = [];
+			if(floor == 0 && this.entrance){
 
+				// Left half of the building - left window
+				this.displayWindow(0, -this.floorHeight - 0.7, posZ);
 
-		this.building(12, 20, 20, 10, 0, 10)
-		this.building(12, 15, 15, 20, 0, 12.5)
-		this.building(12, 15, 15, 0, 0, 12.5)
-
-
-		this.primitiveType = this.scene.gl.TRIANGLES;
-		this.initGLBuffers();
-	}
-	
-
-	building(x_size, y_size, z_size, x_offset = 0, y_offset = 0, z_offset = 0){
-
-		this.addFace(
-			[ //Vertices
-				0, 0, 0,	//0
-				x_size, 0, 0,	//1
-				0, y_size, 0,	//2
-				x_size, y_size, 0	//3
-			],
-			[ //Faces
-				2, 1, 0,
-				2, 3, 1
-			],
-			[ //Normals
-				0, 0, 1,
-				0, 0, 1,
-				0, 0, 1,
-				0, 0, 1
-			],
-			x_offset, y_offset, z_offset
-		)
-
-		this.addFace(
-			[ //Vertices
-				0, 0, z_size,	//0
-				x_size, 0, z_size,	//1
-				0, y_size, z_size,	//2
-				x_size, y_size, z_size	//3
-			],
-			[ //Faces
-				0, 1, 2,
-				1, 3, 2
-			],
-			[ //Normals
-				0, 0, -1,
-				0, 0, -1,
-				0, 0, -1,
-				0, 0, -1
-			],
-			x_offset, y_offset, z_offset
-		)
-
-		this.addFace(
-			[ //Vertices
-				0, 0, 0,	//0
-				0, 0, z_size,	//1
-				0, y_size, 0,	//2
-				0, y_size, z_size	//3
-			],
-			[ //Faces
-				0, 1, 2,
-				1, 3, 2
-			],
-			[ //Normals
-				1, 0, 0,
-				1, 0, 0,
-				1, 0, 0,
-				1, 0, 0
-			],
-			x_offset, y_offset, z_offset
-		)
-
-		this.addFace(
-			[ //Vertices
-				x_size, 0, 0,	//0
-				x_size, 0, z_size,	//1
-				x_size, y_size, 0,	//2
-				x_size, y_size, z_size	//3
-			],
-			[ //Faces
-				2, 1, 0,
-				2, 3, 1
-			],
-			[ //Normals
-				-1, 0, 0,
-				-1, 0, 0,
-				-1, 0, 0,
-				-1, 0, 0
-			],
-			x_offset, y_offset, z_offset
-		)
-
-		this.addFace(
-			[ //Vertices
-				0, y_size, 0,	//0
-				0, y_size, z_size,	//1
-				x_size, y_size, 0,	//2
-				x_size, y_size, z_size	//3
-			],
-			[ //Faces
-				0, 1, 2,
-				1, 3, 2
-			],
-			[ //Normals
-				-1, 0, 0,
-				-1, 0, 0,
-				-1, 0, 0,
-				-1, 0, 0
-			],
-			x_offset, y_offset, z_offset
-		)
-	}
-
-	addFace(verts, indic, norm, x_offset = 0, y_offset = 0, z_offset = 0) {
-
-		let offset = Math.floor(this.vertices.length / 3);
-
-		for (var i = 0; i < verts.length; i++) {
-			var coord = i % 3
-
-			switch (coord) {
-
-				case 0:
-					verts[i] += x_offset;
-					break;
-
-				case 1:
-
-					verts[i] += y_offset;
-					break;
-
-				case 2:
-					verts[i] += z_offset;
-					break;
+				continue;
 			}
-		}
 
-		for (var i = 0; i < indic.length; i++) indic[i] += offset;
+            // Calculate Y position for this floor
+            const floorY = firstFloorY + floor * this.floorHeight;
+            
+            // Left half of the building - left window
+            this.displayWindow(leftQuarterX, floorY, posZ);
+            
+            // Right half of the building - left window
+            this.displayWindow(rightQuarterX, floorY, posZ);
+        }
+        
+        this.scene.popMatrix();
+    }
+    
+    /**
+     * Display windows on the side faces of the building
+     * @param isRight - Whether this is the right face (true) or left face (false)
+     */
+    displaySideWindows(isRight) {
+        // Position for the side face
+        const posX = isRight ? this.width/2 + 0.01 : -this.width/2 - 0.01;
+        // Rotation for the side face
+        const rotation = isRight ? Math.PI/2 : -Math.PI/2;
+        
+        this.scene.pushMatrix();
+        
+        // Apply rotation for the side face
+        this.scene.rotate(rotation, 0, 1, 0);
+        
+        // Calculate center position for the first floor
+        const firstFloorY = -this.height/2 + this.floorHeight/2;
+        
+        // Place windows on each floor
+        for (let floor = 0; floor < this.floors; floor++) {
+            // Calculate Y position for this floor
+            const floorY = firstFloorY + floor * this.floorHeight;
+            
+            // Side face - left window
+            this.displayWindow(-this.depth/4, floorY, posX);
+            
+            // Side face - right window
+            this.displayWindow(this.depth/4, floorY, posX);
+        }
+        
+        this.scene.popMatrix();
+    }
 
-		this.vertices = this.vertices.concat(verts);
-		this.indices = this.indices.concat(indic);
-		this.normals = this.normals.concat(norm);
+    display() {
+        // Top face of the building
+        this.scene.pushMatrix();
+        this.scene.translate(0, this.height/2, 0);
+        this.scene.rotate(-Math.PI/2, 1, 0, 0);
+        this.scene.scale(this.width, this.depth, 1);
+        this.topTexture.bind();
+        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.quad.display();
+        this.scene.popMatrix();
 
-	}
+        // Front face of the building
+        this.scene.pushMatrix();
+        this.scene.translate(0, 0, this.depth/2);
+        this.scene.scale(this.width, this.height, 1);
+        this.frontTexture.bind();
+        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.quad.display();
+        this.scene.popMatrix();
 
-	/**
-	 * @method updateTexCoords
-	 * Updates the list of texture coordinates of the quad
-	 * @param {Array} coords - Array of texture coordinates
-	 */
-	updateTexCoords(coords) {
-		this.texCoords = [...coords];
-		this.updateTexCoordsGLBuffers();
-	}
+        // Back face of the building
+        this.scene.pushMatrix();
+        this.scene.translate(0, 0, -this.depth/2);
+        this.scene.rotate(Math.PI, 0, 1, 0);
+        this.scene.scale(this.width, this.height, 1);
+        this.frontTexture.bind(); // Using front texture for back as well for consistency
+        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.quad.display();
+        this.scene.popMatrix();
+
+        // Right face of the building
+        this.scene.pushMatrix();
+        this.scene.translate(this.width/2, 0, 0);
+        this.scene.rotate(Math.PI/2, 0, 1, 0);
+        this.scene.scale(this.depth, this.height, 1);
+        this.sideTexture.bind();
+        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.quad.display();
+        this.scene.popMatrix();
+
+        // Left face of the building
+        this.scene.pushMatrix();
+        this.scene.translate(-this.width/2, 0, 0);
+        this.scene.rotate(-Math.PI/2, 0, 1, 0);
+        this.scene.scale(this.depth, this.height, 1);
+        this.sideTexture.bind();
+        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.quad.display();
+        this.scene.popMatrix();
+
+        // Bottom face of the building
+        this.scene.pushMatrix();
+        this.scene.translate(0, -this.height/2, 0);
+        this.scene.rotate(Math.PI/2, 1, 0, 0);
+        this.scene.scale(this.width, this.depth, 1);
+        this.topTexture.bind(); // Using top texture for bottom as well
+        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.quad.display();
+        this.scene.popMatrix();
+        
+        // Display windows on front face
+        this.displayFaceWindows(true);
+    }
+
+    changeTexFiltering(filter) {
+        this.textureFiltering = filter;
+    }
 }
-

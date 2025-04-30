@@ -1,68 +1,38 @@
-import { CGFobject } from '../lib/CGF.js';
+import { CGFobject, CGFappearance } from '../lib/CGF.js';
+import { MyQuad } from './MyQuad.js';
+
 /**
- * MyWindow
+ * MyWindow - Simple window implementation for buildings
  * @constructor
- * @param {MyScene} scene - Reference to MyScene object
- * @param {Array} coords - Array of texture coordinates (optional)
+ * @param scene - Reference to MyScene object
+ * @param texture - Texture for the window
  */
 export class MyWindow extends CGFobject {
-    constructor(scene, coords) {
+    constructor(scene, texture) {
         super(scene);
-        this.initBuffers();
-        if (coords != undefined)
-            this.updateTexCoords(coords);
-    }
+        
+        this.quad = new MyQuad(scene);
+        this.texture = texture;
+        
+        // Create a material/appearance for the window
+        this.material = new CGFappearance(this.scene);
+        this.material.setAmbient(0.8, 0.8, 0.8, 1.0);
+        this.material.setDiffuse(0.8, 0.8, 0.8, 1.0);
+        this.material.setSpecular(0.3, 0.3, 0.3, 1.0);
+        this.material.setShininess(20.0);
+        this.material.setTexture(this.texture);
 
-    initBuffers() {
-        this.vertices = [
-            -0.5, -0.5, 0,	//0
-            0.5, -0.5, 0,	//1
-            -0.5, 0.5, 0,	//2
-            0.5, 0.5, 0		//3
-        ];
-
-        //Counter-clockwise reference of vertices
-        this.indices = [
-            0, 1, 2,
-            1, 3, 2
-        ];
-
-        //Facing Z positive
-        this.normals = [
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1
-        ];
-
-        /*
-        Texture coords (s,t)
-        +----------> s
-        |
-        |
-        |
-        v
-        t
-        */
-
-        this.texCoords = [
-            0, 1,
-            1, 1,
-            0, 0,
-            1, 0
-        ]
-        this.primitiveType = this.scene.gl.TRIANGLES;
-        this.initGLBuffers();
+        // Frame thickness relative to window size
+        this.frameThickness = 0.1;
     }
 
     /**
-     * @method updateTexCoords
-     * Updates the list of texture coordinates of the quad
-     * @param {Array} coords - Array of texture coordinates
+     * Displays the window at the current transformation matrix position
      */
-    updateTexCoords(coords) {
-        this.texCoords = [...coords];
-        this.updateTexCoordsGLBuffers();
+    display() {
+        
+        // Then draw the glass part
+        this.material.apply();
+        this.quad.display();
     }
 }
-

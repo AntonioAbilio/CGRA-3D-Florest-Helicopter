@@ -7,7 +7,6 @@ import { MyPanorama } from "./MyPanorama.js";
 import { MyTree } from "./tree/MyTree.js";
 import { MyFlorest } from "./MyFlorest.js";
 
-
 /**
  * MyScene
  * @constructor
@@ -22,15 +21,12 @@ export class MyScene extends CGFscene {
     this.initCameras();
     this.initLights();
 
-    //Background color
     this.gl.clearColor(0, 0, 0, 1.0);
-
     this.gl.clearDepth(100.0);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.depthFunc(this.gl.LEQUAL);
 
-    // Interface items
     this.displayAxis = false;
     this.displayNormals = false;
 
@@ -43,10 +39,8 @@ export class MyScene extends CGFscene {
     this.leavesRGB = 0x184632;
 
     this.enableTextures(true);
-
     this.setUpdatePeriod(50);
 
-    //Initialize scene objects
     this.axis = new CGFaxis(this, 20, 1);
     this.plane = new MyPlane(this, 200);
     this.building = new MyBuilding(this, [0, 0, 0]);
@@ -59,21 +53,58 @@ export class MyScene extends CGFscene {
     this.forestLines = 5;
     this.forestColumns = 4;
     this.florest = new MyFlorest(this, this.forestLines, this.forestColumns);
+    this.plane = new MyPlane(this, 64);
+
+    this.buildingTopTexture = new CGFtexture(this, "textures/buildingTop.png");
+    this.buildingSideTexture = new CGFtexture(this, "textures/buildingSide.png");
+    this.windowTexture = new CGFtexture(this, "textures/window.jpg");
+
+    // Create three buildings with different sizes and number of floors
+    this.centerBuilding = new MyBuilding(
+      this, 
+      this.buildingTopTexture, 
+      this.buildingSideTexture, 
+      this.buildingSideTexture, 
+      this.windowTexture, 
+      3,  // 6 floors for center building
+      true
+    );
+    
+    this.leftBuilding = new MyBuilding(
+      this, 
+      this.buildingSideTexture, 
+      this.buildingSideTexture, 
+      this.buildingSideTexture, 
+      this.windowTexture, 
+      2  // 4 floors for left building
+    );
+    
+    this.rightBuilding = new MyBuilding(
+      this, 
+      this.buildingSideTexture, 
+      this.buildingSideTexture, 
+      this.buildingSideTexture, 
+      this.windowTexture, 
+      2  // 5 floors for right building
+    );
+
+    this.tree = new MyTree(this, 6, 1, 20, this.inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
     this.panorama = new MyPanorama(this, new CGFtexture(this, "textures/panorama.jpg"));
 
-    // Initialize some textures
     this.grass = new CGFtexture(this, "textures/grass.jpg");
     this.appearance = new CGFappearance(this);
     this.appearance.setTexture(this.grass);
     this.appearance.setTextureWrap('REPEAT', 'REPEAT');
 
   }
+
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[0].enable();
     this.lights[0].update();
   }
+
   initCameras() {
     this.camera = new CGFcamera(
       0.6,
@@ -83,22 +114,19 @@ export class MyScene extends CGFscene {
       vec3.fromValues(20, 0, 20)
     );
   }
+
   checkKeys() {
     var text = "Keys pressed: ";
     var keysPressed = false;
-
-    // Check for key codes e.g. in https://keycode.info/
     if (this.gui.isKeyPressed("KeyW")) {
       text += " W ";
       keysPressed = true;
     }
-
     if (this.gui.isKeyPressed("KeyS")) {
       text += " S ";
       keysPressed = true;
     }
-    if (keysPressed)
-      console.log(text);
+    if (keysPressed) console.log(text);
   }
 
   update(t) {
@@ -144,37 +172,54 @@ export class MyScene extends CGFscene {
 
 
   display() {
-    // ---- BEGIN Background, camera and axis setup
-    // Clear image and depth buffer everytime we update the scene
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    // Initialize Model-View matrix as identity (no transformation
     this.updateProjectionMatrix();
     this.loadIdentity();
-    // Apply transformations corresponding to the camera position relative to the origin
     this.applyViewMatrix();
 
-    // Draw axis
-    if (this.displayAxis)
-      this.axis.display();
+    if (this.displayAxis) this.axis.display();
 
     if (this.camera.position[1] < 0.0) {
       this.camera.position[1] = 0.0;
     }
 
     this.setDefaultAppearance();
-
-    this.building.initBuffers();
+    
+    // Initialize buffers for all buildings
+    this.centerBuilding.initBuffers();
+    this.leftBuilding.initBuffers();
+    this.rightBuilding.initBuffers();
 
     let trMatrix = getTranslationMatrix(...this.camera.position);
-
     this.pushMatrix();
     this.multMatrix(trMatrix);
     this.panorama.display();
     this.popMatrix();
 
 
-    this.building.display();
+    // Display center tall building
+    this.pushMatrix();
+    this.translate(0, 10, 0);
+    this.scale(1.5, 2, 1.5); // Make center building taller
+    this.centerBuilding.display(); // Windows are automatically displayed with the building
+    this.popMatrix();
+    
+    // Display left smaller building
+    this.pushMatrix();
+    this.translate(-13.5, 7.5, 0); // Position to the left
+    this.scale(1.2, 1.5, 1); // Make it smaller
+    this.leftBuilding.display(); // Windows are automatically displayed with the building
+    this.popMatrix();
+    
+    // Display right smaller building
+    this.pushMatrix();
+    this.translate(13.5, 7.5, 0); // Position to the right
+    this.scale(1.2, 1.5, 1); // Make it smaller
+    this.rightBuilding.display(); // Windows are automatically displayed with the building
+    this.popMatrix();
+
+    if (this.camera.position[1] < 0.0) this.camera.position[1] = 0.0;
 
     if (this.displayTree) {
       this.tree.display();
@@ -186,6 +231,8 @@ export class MyScene extends CGFscene {
     this.florest.display();
     this.popMatrix()
 
+    // Display ground
+    this.pushMatrix();
     this.scale(400, 1, 400);
     this.rotate(-Math.PI / 2, 1, 0, 0);
 
