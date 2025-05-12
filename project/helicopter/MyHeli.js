@@ -12,15 +12,32 @@ export class MyHeli extends CGFobject {
     constructor(scene, posX, posY, posZ, orientation = 0, velocity_vec3 = [0, 0, 0]) {
         super(scene);
         this.scene = scene;
+
+        // Objects that make up the helicopter
         this.body = new MyHeliPrimitive(scene, 100, 100, 7);
-        this.feet = new Cube(scene);
-        this.orientation = orientation;
-        this.inclination = 0;
+        this.parts = new Cube(scene);
+
+        // Helicopter's Velocity
         this.last_velocity_vec3 = [0, 0, 0];
+        this.velocity_vec3 = velocity_vec3;
+
+        // Helicopter's Position
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
-        this.velocity_vec3 = velocity_vec3;
+        this.orientation = orientation;
+        this.inclination = 0;
+
+        // Helicopter's Functionality
+        this.isCruzing = false;
+        this.ignoreInputs = false;
+
+        // Helices's Position
+        this.top_helice_1_ang = 0.0;
+        this.top_helice_2_ang = 0.0;
+        this.back_helice_1_ang = 0.0;
+        this.back_helice_2_ang = 0.0;
+
         this.initBuffers();
     }
 
@@ -76,7 +93,7 @@ export class MyHeli extends CGFobject {
         this.scene.multMatrix(getTranslationMatrix(2.5, 20, 0))
         this.scene.scale(0.4, 0.4, 10);
         this.bodyTexture.apply();
-        this.feet.display();
+        this.parts.display();
         this.scene.popMatrix();
 
         // Left Feet Connector
@@ -85,7 +102,7 @@ export class MyHeli extends CGFobject {
         this.scene.multMatrix(getZRotationMatrix(45));
         this.scene.scale(0.3, 4, 0.3);
         this.bodyTexture.apply();
-        this.feet.display();
+        this.parts.display();
         this.scene.popMatrix();
 
         // Right feet
@@ -93,7 +110,7 @@ export class MyHeli extends CGFobject {
         this.scene.multMatrix(getTranslationMatrix(-2.5, 20, 0))
         this.scene.scale(0.4, 0.4, 10);
         this.bodyTexture.apply();
-        this.feet.display();
+        this.parts.display();
         this.scene.popMatrix();
 
         // Right Feet Connector
@@ -102,24 +119,28 @@ export class MyHeli extends CGFobject {
         this.scene.multMatrix(getZRotationMatrix(-45));
         this.scene.scale(0.3, 4, 0.3);
         this.bodyTexture.apply();
-        this.feet.display();
+        this.parts.display();
         this.scene.popMatrix();
 
         // Top Helice_1
         this.scene.pushMatrix();
+        this.scene.multMatrix(getYRotationMatrix(this.top_helice_1_ang))
         this.scene.multMatrix(getTranslationMatrix(0, 28, 0))
         this.scene.scale(0.4, 0.4, 10);
         this.bodyTexture.apply();
-        this.feet.display();
+        this.parts.display();
         this.scene.popMatrix();
 
         // Top Helice_2
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(0, 28, 0))
         this.scene.multMatrix(getYRotationMatrix(90))
+        this.scene.multMatrix(getYRotationMatrix(this.top_helice_2_ang))
+        // FIXME: Why is this NaN when we don't check if it actually is ? 
+        // console.log(`top helice value: ${this.top_helice_2_ang}`);
         this.scene.scale(0.4, 0.4, 10);
         this.bodyTexture.apply();
-        this.feet.display();
+        this.parts.display();
         this.scene.popMatrix();
 
         // Tail
@@ -151,26 +172,27 @@ export class MyHeli extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(-0.75, 24, 9))
         this.scene.multMatrix(getXRotationMatrix(135))
+        this.scene.multMatrix(getXRotationMatrix(this.back_helice_1_ang))
         this.scene.scale(0.2, 0.2, 2);
         this.bodyTexture.apply();
-        this.feet.display();
+        this.parts.display();
         this.scene.popMatrix();
 
         // Back Helice_2
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(-0.75, 24, 9))
         this.scene.multMatrix(getXRotationMatrix(45))
+        this.scene.multMatrix(getXRotationMatrix(this.back_helice_2_ang))
         this.scene.scale(0.2, 0.2, 2);
         this.bodyTexture.apply();
-        this.feet.display();
+        this.parts.display();
         this.scene.popMatrix();
 
         this.scene.popMatrix();
 
     }
 
-    update(delta) {
-
+    updatePosition(delta) {
         this.posX = isNaN(this.posX) ? 0 : this.posX;
         this.posY = isNaN(this.posY) ? 0 : this.posY;
         this.posZ = isNaN(this.posZ) ? 0 : this.posZ;
@@ -182,23 +204,86 @@ export class MyHeli extends CGFobject {
         this.last_velocity_vec3[0] = this.velocity_vec3[0];
         this.last_velocity_vec3[1] = this.velocity_vec3[1];
         this.last_velocity_vec3[2] = this.velocity_vec3[2];
+    }
 
+    flyChecks() {
+        // Check if have already hit the cruzing altitude.
+        // If we are not cruzing but our Y position is already equal or over 10 then we are flying (cruzing).
+        if (!this.isCruzing && this.posY >= 10.0) {
+            this.velocity_vec3[1] = 0.0;
+            this.isCruzing = true;
+            this.ignoreInputs = false;
+        }
+
+        // Check if we are already on the ground.
+        // If we are ignoring inputs (setted true when we want to begin descent), we were at a
+        // cruzing altitude (if we are flying) indicated by the boolean "isCruzing" and the 
+        // Y position is less or equal than 0.5 then we have already hit the ground.
+        if (this.ignoreInputs && this.isCruzing && this.posY <= 0.5) {
+
+            // TODO: Need to do more verifications (See 4.3.2)
+
+            /* this.velocity_vec3[1] = 0.0;
+            this.isCruzing = false;
+            this.ignoreInputs = false;
+            this.top_helice_1_ang = 0;
+            this.top_helice_2_ang = 0;
+            this.back_helice_1_ang = 0;
+            this.back_helice_2_ang = 0; */
+            this.reset();
+        }
+    }
+
+    updateHelices(delta) {
+        const topHeliceSpeed = 500;
+        const backHeliceSpeed = 900;
+
+        // Update helice angles
+        this.top_helice_1_ang += topHeliceSpeed * delta;
+        this.top_helice_2_ang += topHeliceSpeed * delta;
+        this.back_helice_1_ang += backHeliceSpeed * delta;
+        this.back_helice_2_ang += backHeliceSpeed * delta;
+
+        // Prevents big values...
+        this.top_helice_1_ang %= 360;
+        this.top_helice_2_ang %= 360;
+        this.back_helice_1_ang %= 360;
+        this.back_helice_2_ang %= 360;
+
+        // FIXME: WHY IS THIS HAPPENING ???
+        this.top_helice_1_ang = isNaN(this.top_helice_1_ang) ? 0 : this.top_helice_1_ang;
+        this.top_helice_2_ang = isNaN(this.top_helice_1_ang) ? 0 : this.top_helice_1_ang;
+        this.back_helice_1_ang = isNaN(this.back_helice_1_ang) ? 0 : this.back_helice_1_ang;
+        this.back_helice_2_ang = isNaN(this.back_helice_2_ang) ? 0 : this.back_helice_2_ang;
+    }
+
+
+
+    update(delta) {
+        if (this.posY > 0.0) {
+            this.updateHelices(delta);
+        }
+
+        // Updates the X, Y and Z position of the helicopter according to delta and the velocity
+        this.updatePosition(delta);
+
+        // Checks if the helicopter can stop movement on the Y axis.
+        this.flyChecks();
     }
 
     turn(v) {
         this.orientation += v;
-
-        console.log(`Current orientation ${this.orientation}`);
     }
 
     accelarate(t) {
+        if (this.ignoreInputs) {
+            return;
+        }
 
-        let baseAcceleration = 9.8
-        this.velocity_vec3[0] += baseAcceleration * t;
-        this.velocity_vec3[2] += baseAcceleration * t;
+        this.velocity_vec3[0] += this.scene.baseAcceleration * t;
+        this.velocity_vec3[2] += this.scene.baseAcceleration * t;
 
         if ((this.velocity_vec3[0] - this.last_velocity_vec3[0] < 0.0) || (this.velocity_vec3[2] - this.last_velocity_vec3[2] < 0.0)) {
-
 
             if (this.velocity_vec3[0] < 0.0 || this.velocity_vec3[2] < 0.0) {
                 this.velocity_vec3 = [0, 0, 0]; // The helicopter can only go backwards if it is pointing in the other direction
@@ -224,6 +309,38 @@ export class MyHeli extends CGFobject {
         this.posY = 0;
         this.posZ = 0;
         this.velocity_vec3 = [0, 0, 0];
+        this.isCruzing = false;
+        this.ignoreInputs = false;
+    }
+
+    fly() {
+
+        // Check if we are already flying and if we need to ignore inputs.
+        if (this.isCruzing || this.ignoreInputs) {
+            return;
+        }
+
+        // Prevent interactions with the helicopter while its taking off or desending.
+        this.ignoreInputs = true;
+
+        // Start the movement of the helicopter.
+        this.velocity_vec3[1] += this.scene.baseAcceleration;
+
+    }
+
+    stopFlying() {
+
+        // Check if we are really flying and if we should ignore inputs.
+        if (!this.isCruzing || this.ignoreInputs) {
+            return;
+        }
+
+        // Prevent interactions with the helicopter while its taking off or desending.
+        this.ignoreInputs = true;
+
+        // Begin descent.
+        this.velocity_vec3[1] -= this.scene.baseAcceleration;
+
     }
 
 }

@@ -30,6 +30,9 @@ export class MyScene extends CGFscene {
     this.displayAxis = false;
     this.displayNormals = false;
 
+    // World variables
+    this.baseAcceleration = 9.8
+
     // Tree Settings
     this.treeSize = 10;
     this.X_inclination = 0.0;
@@ -145,8 +148,22 @@ export class MyScene extends CGFscene {
     if (this.gui.isKeyPressed("KeyR")) {
       text += " R ";
       keysPressed = true;
-      //this.heli.reset();
+      this.heli.reset();
     }
+
+    if (this.gui.isKeyPressed("KeyP")) {
+      text += " P ";
+      keysPressed = true;
+      this.heli.fly();
+    }
+
+    if (this.gui.isKeyPressed("KeyL")) {
+      text += " L ";
+      keysPressed = true;
+      this.heli.stopFlying();
+    }
+
+
     if (keysPressed) console.log(text);
   }
 
@@ -162,7 +179,6 @@ export class MyScene extends CGFscene {
 
     this.checkKeys(deltaTime);
 
-    //console.log("here")
     this.heli.update(deltaTime);
   }
 
