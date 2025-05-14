@@ -31,7 +31,8 @@ export class MyScene extends CGFscene {
     this.displayNormals = false;
 
     // World variables
-    this.baseAcceleration = 9.8
+    this.baseAcceleration = 9.8;
+    this.speedFactor = 3;
 
     // Tree Settings
     this.treeSize = 10;
@@ -217,6 +218,11 @@ export class MyScene extends CGFscene {
   updateForestColumns(numCols) {
     this.forestColumns = numCols;
     this.florest.updateColumns(numCols);
+  }
+
+  updateSpeedFactor(speedFactor) {
+    this.speedFactor = speedFactor;
+    this.baseAcceleration = 9.8 * speedFactor;
   }
 
 

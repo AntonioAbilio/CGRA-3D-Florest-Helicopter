@@ -29,8 +29,12 @@ export class MyHeli extends CGFobject {
         this.inclination = 0;
 
         // Helicopter's Functionality
-        this.isCruzing = false;
+        // FIXME: Substitute this for a state machine...
+        this.isFlying = false;
         this.ignoreInputs = false;
+        this.readyToDescend = false;
+        this.readyToLand = false;
+        this.autoPilotState = -1;
 
         // Helices's Position
         this.top_helice_1_ang = 0.0;
@@ -100,7 +104,7 @@ export class MyHeli extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(2, 20.5, 0))
         this.scene.multMatrix(getZRotationMatrix(45));
-        this.scene.scale(0.3, 4, 0.3);
+        this.scene.scale(0.3, 1.5, 0.3);
         this.bodyTexture.apply();
         this.parts.display();
         this.scene.popMatrix();
@@ -117,7 +121,7 @@ export class MyHeli extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(-2, 20.5, 0))
         this.scene.multMatrix(getZRotationMatrix(-45));
-        this.scene.scale(0.3, 4, 0.3);
+        this.scene.scale(0.3, 1.5, 0.3);
         this.bodyTexture.apply();
         this.parts.display();
         this.scene.popMatrix();
@@ -208,30 +212,34 @@ export class MyHeli extends CGFobject {
 
     flyChecks() {
         // Check if have already hit the cruzing altitude.
-        // If we are not cruzing but our Y position is already equal or over 10 then we are flying (cruzing).
-        if (!this.isCruzing && this.posY >= 10.0) {
+        // If we are not flying but our Y position is already equal or over 10 then we are flying (we have reached the target altitude)
+        // which means that the helicopter should stop ascending and user should now be able to control the helicopter.
+        if (!this.isFlying && this.posY >= 10.0) {
             this.velocity_vec3[1] = 0.0;
-            this.isCruzing = true;
+            this.isFlying = true;
             this.ignoreInputs = false;
         }
 
-        // Check if we are already on the ground.
-        // If we are ignoring inputs (setted true when we want to begin descent), we were at a
-        // cruzing altitude (if we are flying) indicated by the boolean "isCruzing" and the 
-        // Y position is less or equal than 0.5 then we have already hit the ground.
-        if (this.ignoreInputs && this.isCruzing && this.posY <= 0.5) {
+        // User used the L key...
+        if (this.readyToDescend) {
 
             // TODO: Need to do more verifications (See 4.3.2)
+            if (false) {
+                console.log("TODO: Check if above lake, above bulding, empty or full bucket...")
+            } else {
+                // If we aren't top of the lake and on top of the bulding than we need to activate autopilot
+                if (this.autoPilotState == -1) {
+                    this.autoPilotState = 0;
+                }
+            }
+        }
 
-            /* this.velocity_vec3[1] = 0.0;
-            this.isCruzing = false;
-            this.ignoreInputs = false;
-            this.top_helice_1_ang = 0;
-            this.top_helice_2_ang = 0;
-            this.back_helice_1_ang = 0;
-            this.back_helice_2_ang = 0; */
+        // We are only ready to land in the case that we are above the bulding or in the case where the bucket is
+        // empty and we are not on top of the lake...
+        if (this.readyToLand) {
             this.reset();
         }
+
     }
 
     updateHelices(delta) {
@@ -257,6 +265,124 @@ export class MyHeli extends CGFobject {
         this.back_helice_2_ang = isNaN(this.back_helice_2_ang) ? 0 : this.back_helice_2_ang;
     }
 
+    autoPilotStateUpdate() {
+
+        switch (this.autoPilotState) {
+            case 0: // We are dealing with positive Z
+                if (this.posZ < 0.0) {
+                    this.autoPilotState++;
+                }
+
+                if (this.posZ > 0.0) {
+
+                    if (this.orientation == 180 || this.orientation == -180) {
+                        this.posZ -= 1.0;
+                    } else {
+
+                        if (this.orientation <= 0) {
+                            this.orientation--;
+                        }
+
+                        if (this.orientation > 0) {
+                            this.orientation++;
+                        }
+
+                    }
+                } else {
+                    this.posZ = 0.0;
+                    this.autoPilotState++;
+                }
+                break;
+            case 1: // We are dealing with negative Z
+                if (this.posZ < 0.0) {
+
+                    if (this.orientation == 0) {
+                        this.posZ += 1.0;
+                    } else {
+
+                        if (this.orientation > 0) {
+                            this.orientation--
+                        }
+
+                        if (this.orientation <= 0) {
+                            this.orientation++
+                        }
+
+                    }
+                } else {
+                    this.autoPilotState++;
+                }
+                break;
+            case 2: // We are dealing with positive X
+                if (this.posX < 0.0) {
+                    this.autoPilotState++;
+                }
+
+                if (this.posX > 0.0) {
+
+                    if (this.orientation == 270 || this.orientation == -90) {
+                        this.posX -= 1.0;
+                    } else {
+
+                        if (this.orientation <= 0) {
+                            this.orientation--;
+                        }
+
+                        if (this.orientation > 0) {
+                            this.orientation++;
+                        }
+
+                    }
+                } else {
+                    this.posX = 0.0;
+                    this.autoPilotState++;
+                }
+                break;
+            case 3: // We are dealing with negative X
+                if (this.posX < 0.0) {
+
+                    if (this.orientation == 90 || this.orientation == -270) {
+                        this.posX += 1.0;
+                    } else {
+
+                        if (this.orientation <= 0) {
+                            this.orientation--;
+                        }
+
+                        if (this.orientation > 0) {
+                            this.orientation++;
+                        }
+
+                    }
+                } else {
+                    this.posX = 0.0;
+                    this.autoPilotState++;
+                }
+                break;
+            case 4: // Reset the orientation to be the initial one.
+                if (this.orientation < 0) {
+                    this.orientation++;
+                } else {
+                    this.orientation--;
+                }
+
+                if (this.orientation == 0) {
+                    this.autoPilotState++;
+                    this.velocity_vec3[1] -= this.scene.baseAcceleration; // Apply the velocity
+                }
+                break;
+            case 5:
+                if (this.posY <= 0.5) {
+                    this.readyToLand = true;
+                    this.autoPilotState = -1;
+                }
+                break;
+            default: // Autopilot is not active
+                break;
+        }
+
+    }
+
 
 
     update(delta) {
@@ -264,15 +390,24 @@ export class MyHeli extends CGFobject {
             this.updateHelices(delta);
         }
 
+        // TODO: remove
+        //console.log(`OR: ${this.orientation} X: ${this.posX} Y: ${this.posY} Z: ${this.posZ}`)
+
+        // Update autopilot state. If it is set to -1 nothing will happen.
+        this.autoPilotStateUpdate();
+
         // Updates the X, Y and Z position of the helicopter according to delta and the velocity
         this.updatePosition(delta);
 
         // Checks if the helicopter can stop movement on the Y axis.
         this.flyChecks();
+
+        // Keep the orientation between (-360 and 360).
+        this.orientation %= 360;
     }
 
     turn(v) {
-        this.orientation += v;
+        this.orientation += (v * this.scene.speedFactor);
     }
 
     accelarate(t) {
@@ -309,14 +444,17 @@ export class MyHeli extends CGFobject {
         this.posY = 0;
         this.posZ = 0;
         this.velocity_vec3 = [0, 0, 0];
-        this.isCruzing = false;
+        this.isFlying = false;
         this.ignoreInputs = false;
+        this.readyToDescend = false;
+        this.readyToLand = false;
+        this.autoPilotState = -1;
     }
 
     fly() {
 
         // Check if we are already flying and if we need to ignore inputs.
-        if (this.isCruzing || this.ignoreInputs) {
+        if (this.isFlying || this.ignoreInputs) {
             return;
         }
 
@@ -331,16 +469,15 @@ export class MyHeli extends CGFobject {
     stopFlying() {
 
         // Check if we are really flying and if we should ignore inputs.
-        if (!this.isCruzing || this.ignoreInputs) {
+        if (!this.isFlying || this.ignoreInputs || this.readyToDescend) {
             return;
         }
 
+        // Start the autopilot...
+        this.readyToDescend = true;
+
         // Prevent interactions with the helicopter while its taking off or desending.
         this.ignoreInputs = true;
-
-        // Begin descent.
-        this.velocity_vec3[1] -= this.scene.baseAcceleration;
-
     }
 
 }
