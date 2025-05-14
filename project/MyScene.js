@@ -7,6 +7,8 @@ import { MyTree } from "./tree/MyTree.js";
 import { MyFlorest } from "./MyFlorest.js";
 import { MyHeli } from "./helicopter/MyHeli.js";
 
+import { MyFire } from "./MyFire.js";
+
 /**
  * MyScene
  * @constructor
@@ -54,7 +56,11 @@ export class MyScene extends CGFscene {
     this.displayTree = false;
     this.tree = new MyTree(this, this.treeSize, this.X_inclination, this.Z_inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
 
-    this.forestLines = 5;
+
+    this.fireTexture = new CGFtexture(this, "textures/fire.jpg");
+    this.fire = new MyFire(this, this.fireTexture, 4);
+
+    this.forestLines = 5;http://127.0.0.1:5500/project/
     this.forestColumns = 4;
     this.florest = new MyFlorest(this, this.forestLines, this.forestColumns);
     this.plane = new MyPlane(this, 64);
@@ -290,6 +296,11 @@ export class MyScene extends CGFscene {
     this.popMatrix()
 
     this.heli.display();
+
+    this.pushMatrix();
+    this.translate(0, 10, 30); // adjust as needed
+    this.fire.display();
+    this.popMatrix();
 
     // Display ground
     this.pushMatrix();
