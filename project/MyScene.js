@@ -30,6 +30,10 @@ export class MyScene extends CGFscene {
     this.displayAxis = false;
     this.displayNormals = false;
 
+    // World variables
+    this.baseAcceleration = 9.8;
+    this.speedFactor = 3;
+
     // Tree Settings
     this.treeSize = 10;
     this.X_inclination = 0.0;
@@ -44,7 +48,7 @@ export class MyScene extends CGFscene {
     this.axis = new CGFaxis(this, 20, 1);
     this.plane = new MyPlane(this, 200);
     this.building = new MyBuilding(this, [0, 0, 0]);
-    this.heli = new MyHeli(this);
+    this.heli = new MyHeli(this, 0.0, 0.0, 0.0, 0, [0, 0, 0]);
     // TODO: remove and substitute for florest
 
     this.displayTree = false;
@@ -110,27 +114,73 @@ export class MyScene extends CGFscene {
       0.6,
       0.9,
       1000,
-      vec3.fromValues(10, 80, 10),
+      vec3.fromValues(-31, 56, -47),
       vec3.fromValues(20, 0, 20)
     );
   }
 
-  checkKeys() {
+  checkKeys(deltaTime) {
     var text = "Keys pressed: ";
     var keysPressed = false;
     if (this.gui.isKeyPressed("KeyW")) {
       text += " W ";
       keysPressed = true;
+      this.heli.accelarate(deltaTime);
     }
+
+    if (this.gui.isKeyPressed("KeyA")) {
+      text += " A ";
+      keysPressed = true;
+      this.heli.turn(1);
+    }
+
     if (this.gui.isKeyPressed("KeyS")) {
       text += " S ";
       keysPressed = true;
+      this.heli.accelarate(-deltaTime);
     }
+
+    if (this.gui.isKeyPressed("KeyD")) {
+      text += " D ";
+      keysPressed = true;
+      this.heli.turn(-1);
+    }
+
+    if (this.gui.isKeyPressed("KeyR")) {
+      text += " R ";
+      keysPressed = true;
+      this.heli.reset();
+    }
+
+    if (this.gui.isKeyPressed("KeyP")) {
+      text += " P ";
+      keysPressed = true;
+      this.heli.fly();
+    }
+
+    if (this.gui.isKeyPressed("KeyL")) {
+      text += " L ";
+      keysPressed = true;
+      this.heli.stopFlying();
+    }
+
+
     if (keysPressed) console.log(text);
   }
 
   update(t) {
-    this.checkKeys();
+
+    if (this.prevTime === 0) {
+      this.prevTime = t;
+      return; // Skip first frame
+    }
+
+    const deltaTime = (t - this.prevTime) / 1000;
+    this.prevTime = t;
+
+    this.checkKeys(deltaTime);
+
+    this.heli.update(deltaTime);
   }
 
   setDefaultAppearance() {
@@ -168,6 +218,11 @@ export class MyScene extends CGFscene {
   updateForestColumns(numCols) {
     this.forestColumns = numCols;
     this.florest.update(numCols, undefined);
+  }
+
+  updateSpeedFactor(speedFactor) {
+    this.speedFactor = speedFactor;
+    this.baseAcceleration = 9.8 * speedFactor;
   }
 
 

@@ -30,6 +30,8 @@ export class MyInterface extends CGFinterface {
 
         this.gui.add(this.scene, 'displayNormals').name("Display normals");
 
+        this.gui.add(this.scene, 'speedFactor', 0.1, 3).name("Speed Factor").onChange(this.scene.updateSpeedFactor.bind(this.scene));
+
         // Tree folder
         var f0 = this.gui.addFolder('Tree Settings');
         f0.add(this.scene, 'displayTree').name("Display tree");
