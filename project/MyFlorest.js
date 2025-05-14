@@ -17,11 +17,14 @@ export class MyFlorest extends CGFobject {
         this.num_columns = num_columns;
         this.scene = scene;
 
+        this.x_size = 100;
+        this.z_size = 100;
+
         // Generate random positions and parameters for trees
         this.trees = [];
         this.treePositions = [];
 
-        this.updateColumns(num_columns);
+        this.update(num_columns, num_lines);
 
     }
 
@@ -40,43 +43,22 @@ export class MyFlorest extends CGFobject {
         }
     }
 
-    updateColumns(num_cols) {
-        // Generate random positions and parameters for trees
+    update(num_cols = this.num_columns, num_lines = this.num_lines) {
+
         this.num_columns = num_cols;
-        this.trees = [];
-        this.treePositions = [];
-        let x = 0;
-        let z = 0;
-        let spacing = 10;
-        for (let row = 0; row < this.num_lines; row++) {
-            for (let col = 0; col < this.num_columns; col++) {
-
-                x += Math.max(Math.random() * spacing, 4);
-
-                // Store the tree and its position
-                this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632));
-                this.treePositions.push({
-                    x: x,
-                    z: z
-                });
-            }
-            x = 0;
-            z += Math.max(Math.random() * spacing, 4);
-        }
-    }
-
-    updateLines(num_lines) {
-        // Generate random positions and parameters for trees
         this.num_lines = num_lines;
+
+        // Generate random positions and parameters for trees
         this.trees = [];
         this.treePositions = [];
         let x = 0;
         let z = 0;
-        let spacing = 10;
+
+        let spacing_x = this.x_size/this.num_columns;
+        let spacing_z = this.z_size/this.num_lines;
+
         for (let row = 0; row < this.num_lines; row++) {
             for (let col = 0; col < this.num_columns; col++) {
-
-                x += Math.max(Math.random() * spacing, 4);
 
                 // Store the tree and its position
                 this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632));
@@ -84,9 +66,11 @@ export class MyFlorest extends CGFobject {
                     x: x,
                     z: z
                 });
+
+                x += spacing_x;
             }
             x = 0;
-            z += Math.max(Math.random() * spacing, 4);
+            z += spacing_z;
         }
     }
 }

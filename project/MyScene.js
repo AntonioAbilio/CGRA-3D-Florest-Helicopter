@@ -162,12 +162,12 @@ export class MyScene extends CGFscene {
 
   updateForestLines(numLines) {
     this.forestLines = numLines;
-    this.florest.updateLines(numLines);
+    this.florest.update(undefined, numLines);
   }
 
   updateForestColumns(numCols) {
     this.forestColumns = numCols;
-    this.florest.updateColumns(numCols);
+    this.florest.update(numCols, undefined);
   }
 
 
