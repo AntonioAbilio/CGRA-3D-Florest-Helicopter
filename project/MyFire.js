@@ -1,4 +1,4 @@
-import { CGFobject } from '../lib/CGF.js';
+import { CGFobject, CGFshader} from '../lib/CGF.js';
 
 export class MyFire extends CGFobject {
     constructor(scene, texture, scale = 2.0) {
@@ -6,6 +6,9 @@ export class MyFire extends CGFobject {
         this.texture = texture;
         this.scale = scale;
         this.initBuffers();
+
+        this.shader = new CGFshader(scene.gl, "shaders/fire.vert", "shaders/fire.frag");
+        this.shader.setUniformsValues({ uSampler: 0 });
     }
 
     initBuffers() {
@@ -57,9 +60,14 @@ export class MyFire extends CGFobject {
     }
 
     display() {
-        if (this.texture) {
-            this.texture.bind();
-        }
+        if (this.texture) this.texture.bind(0);
+
+        this.shader.setUniformsValues({
+            uTime: performance.now() / 1000.0, // time in seconds
+        });
+
+        this.scene.setActiveShader(this.shader);
         super.display();
+        this.scene.setActiveShader(this.scene.defaultShader);
     }
 }
