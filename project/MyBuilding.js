@@ -90,13 +90,7 @@ export class MyBuilding extends CGFobject {
         // Place windows on each floor
         for (let floor = 0; floor < this.floors; floor++) {
 
-			if(floor == 0 && this.entrance){
-
-				// Left half of the building - left window
-				this.displayWindow(0, -this.floorHeight - 0.7, posZ);
-
-				continue;
-			}
+			if(floor == 0 && this.entrance)continue;
 
             // Calculate Y position for this floor
             const floorY = firstFloorY + floor * this.floorHeight;
@@ -165,7 +159,7 @@ export class MyBuilding extends CGFobject {
         this.scene.translate(0, 0, -this.depth/2);
         this.scene.rotate(Math.PI, 0, 1, 0);
         this.scene.scale(this.width, this.height, 1);
-        this.frontTexture.bind(); // Using front texture for back as well for consistency
+        this.sideTexture.bind(); // Using front texture for back as well for consistency
         this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
         this.quad.display();
         this.scene.popMatrix();

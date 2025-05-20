@@ -67,13 +67,14 @@ export class MyScene extends CGFscene {
 
     this.buildingTopTexture = new CGFtexture(this, "textures/buildingTop.png");
     this.buildingSideTexture = new CGFtexture(this, "textures/buildingSide.png");
+    this.buildingFrontTexture = new CGFtexture(this, "textures/buildingSideFront.png");
     this.windowTexture = new CGFtexture(this, "textures/window.jpg");
 
     // Create three buildings with different sizes and number of floors
     this.centerBuilding = new MyBuilding(
       this,
       this.buildingTopTexture,
-      this.buildingSideTexture,
+      this.buildingFrontTexture,
       this.buildingSideTexture,
       this.windowTexture,
       3,
