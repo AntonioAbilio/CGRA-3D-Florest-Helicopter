@@ -2,6 +2,8 @@ import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 import { MyHeliPrimitive } from './MyHeliPrimitive.js';
 import { getRad, getTranslationMatrix, getXRotationMatrix, getYRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
 import { Cube } from './Cube.js'
+import { MyBucket } from '../MyBucket.js';
+import { MyCircle } from '../MyCircle.js';
 
 /**
  * MyHeli
@@ -28,12 +30,16 @@ export class MyHeli extends CGFobject {
         this.orientation = orientation;
         this.inclination = 0;
 
+        this.bucket = new MyBucket(this.scene);
+        this.bucketCover = new MyCircle(this.scene);
+
         // Helicopter's Functionality
         // FIXME: Substitute this for a state machine...
         this.isFlying = false;
         this.ignoreInputs = false;
         this.readyToDescend = false;
         this.readyToLand = false;
+        this.bucketOpen = false;
         this.autoPilotState = -1;
 
         // Helices's Position
@@ -67,18 +73,40 @@ export class MyHeli extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(this.posX, this.posY, this.posZ));
         this.scene.multMatrix(getYRotationMatrix(180 + this.orientation));
-        this.scene.multMatrix(getXRotationMatrix(this.inclination));
+
+        // Bucket
+        if (this.isFlying) {
+            this.scene.pushMatrix();
+            this.scene.multMatrix(getTranslationMatrix(0, 10, 0));
+            this.scene.multMatrix(getXRotationMatrix(-90));
+            this.bodyTexture.apply();
+            this.bucket.display();
+            this.scene.popMatrix();
+
+            // Bucket Cover
+            this.scene.pushMatrix();
+            this.scene.multMatrix(getTranslationMatrix(0, 10, 0));
+            this.bodyTexture.apply();
+            if (this.bucketOpen) {
+                this.scene.multMatrix(getXRotationMatrix(90));
+            }
+            this.bucketCover.display();
+            this.scene.popMatrix();
+        }
 
         // Main Helicopter Body
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(0, 24, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.scale(0.59, 0.48, 0.71);
         this.bodyTexture.apply();
         this.body.display();
         this.scene.popMatrix();
 
         this.scene.pushMatrix();
-        this.scene.multMatrix(getTranslationMatrix(0, 24, -1))
+        this.scene.multMatrix(getTranslationMatrix(0, 24, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
+        this.scene.multMatrix(getTranslationMatrix(0, 0, -1))
         this.scene.scale(0.5, 0.42, 0.67);
         this.bodyWindow.apply();
         this.body.display();
@@ -87,6 +115,7 @@ export class MyHeli extends CGFobject {
         // Small part that connects the helices to the body
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(0, 27, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.scale(0.05, 0.2, 0.05);
         this.bodyTexture.apply();
         this.body.display();
@@ -95,6 +124,7 @@ export class MyHeli extends CGFobject {
         // Left feet
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(2.5, 20, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.scale(0.4, 0.4, 10);
         this.bodyTexture.apply();
         this.parts.display();
@@ -103,6 +133,7 @@ export class MyHeli extends CGFobject {
         // Left Feet Connector
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(2, 20.5, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.multMatrix(getZRotationMatrix(45));
         this.scene.scale(0.3, 1.5, 0.3);
         this.bodyTexture.apply();
@@ -112,6 +143,7 @@ export class MyHeli extends CGFobject {
         // Right feet
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(-2.5, 20, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.scale(0.4, 0.4, 10);
         this.bodyTexture.apply();
         this.parts.display();
@@ -120,6 +152,7 @@ export class MyHeli extends CGFobject {
         // Right Feet Connector
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(-2, 20.5, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.multMatrix(getZRotationMatrix(-45));
         this.scene.scale(0.3, 1.5, 0.3);
         this.bodyTexture.apply();
@@ -130,6 +163,7 @@ export class MyHeli extends CGFobject {
         this.scene.pushMatrix();
         this.scene.multMatrix(getYRotationMatrix(this.top_helice_1_ang))
         this.scene.multMatrix(getTranslationMatrix(0, 28, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.scale(0.4, 0.4, 10);
         this.bodyTexture.apply();
         this.parts.display();
@@ -138,10 +172,9 @@ export class MyHeli extends CGFobject {
         // Top Helice_2
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(0, 28, 0))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.multMatrix(getYRotationMatrix(90))
         this.scene.multMatrix(getYRotationMatrix(this.top_helice_2_ang))
-        // FIXME: Why is this NaN when we don't check if it actually is ? 
-        // console.log(`top helice value: ${this.top_helice_2_ang}`);
         this.scene.scale(0.4, 0.4, 10);
         this.bodyTexture.apply();
         this.parts.display();
@@ -150,6 +183,7 @@ export class MyHeli extends CGFobject {
         // Tail
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(0, 24, 2))
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.scale(0.15, 0.15, 1);
         this.bodyTexture.apply();
         this.body.display();
@@ -157,7 +191,16 @@ export class MyHeli extends CGFobject {
 
         // Small part that connects the back helices to the body
         this.scene.pushMatrix();
-        this.scene.multMatrix(getTranslationMatrix(0, 24, 9))
+
+        if (this.inclination < 0) {
+            this.scene.multMatrix(getTranslationMatrix(0, this.inclination == 0 ? 24 : 25, 9))
+
+        } else {
+            this.scene.multMatrix(getTranslationMatrix(0, this.inclination == 0 ? 24 : 23.5, 9))
+
+        }
+
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.scale(0.05, 0.2, 0.05);
         this.bodyTexture.apply();
         this.body.display();
@@ -165,16 +208,32 @@ export class MyHeli extends CGFobject {
 
         // Another small part that lets the helices spin without hitting the body
         this.scene.pushMatrix();
-        this.scene.multMatrix(getTranslationMatrix(-0.5, 24, 9))
+        if (this.inclination < 0) {
+            this.scene.multMatrix(getTranslationMatrix(-0.5, this.inclination == 0 ? 24 : 25, 9))
+
+        } else {
+            this.scene.multMatrix(getTranslationMatrix(-0.5, this.inclination == 0 ? 24 : 23.5, 9))
+
+        }
+
         this.scene.multMatrix(getZRotationMatrix(90))
         this.scene.scale(0.02, 0.1, 0.02);
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.bodyTexture.apply();
         this.body.display();
         this.scene.popMatrix();
 
         // Back Helice_1
         this.scene.pushMatrix();
-        this.scene.multMatrix(getTranslationMatrix(-0.75, 24, 9))
+        if (this.inclination < 0) {
+            this.scene.multMatrix(getTranslationMatrix(-0.75, this.inclination == 0 ? 24 : 25, 9))
+
+        } else {
+            this.scene.multMatrix(getTranslationMatrix(-0.75, this.inclination == 0 ? 24 : 23.5, 9))
+
+        }
+
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.multMatrix(getXRotationMatrix(135))
         this.scene.multMatrix(getXRotationMatrix(this.back_helice_1_ang))
         this.scene.scale(0.2, 0.2, 2);
@@ -184,7 +243,14 @@ export class MyHeli extends CGFobject {
 
         // Back Helice_2
         this.scene.pushMatrix();
-        this.scene.multMatrix(getTranslationMatrix(-0.75, 24, 9))
+        if (this.inclination < 0) {
+            this.scene.multMatrix(getTranslationMatrix(-0.75, this.inclination == 0 ? 24 : 25, 9))
+
+        } else {
+            this.scene.multMatrix(getTranslationMatrix(-0.75, this.inclination == 0 ? 24 : 23.5, 9))
+
+        }
+        this.scene.multMatrix(getXRotationMatrix(this.inclination));
         this.scene.multMatrix(getXRotationMatrix(45))
         this.scene.multMatrix(getXRotationMatrix(this.back_helice_2_ang))
         this.scene.scale(0.2, 0.2, 2);
@@ -271,6 +337,7 @@ export class MyHeli extends CGFobject {
             case 0: // We are dealing with positive Z
                 if (this.posZ < 0.0) {
                     this.autoPilotState++;
+                    break;
                 }
 
                 if (this.posZ > 0.0) {
@@ -316,6 +383,7 @@ export class MyHeli extends CGFobject {
             case 2: // We are dealing with positive X
                 if (this.posX < 0.0) {
                     this.autoPilotState++;
+                    break;
                 }
 
                 if (this.posX > 0.0) {
@@ -448,6 +516,7 @@ export class MyHeli extends CGFobject {
         this.ignoreInputs = false;
         this.readyToDescend = false;
         this.readyToLand = false;
+        this.bucketOpen = false;
         this.autoPilotState = -1;
     }
 
