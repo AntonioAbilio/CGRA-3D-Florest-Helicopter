@@ -285,7 +285,7 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
     this.multMatrix(getYRotationMatrix(90));
-    this.multMatrix(getTranslationMatrix(0, 0, 0));
+    this.multMatrix(getTranslationMatrix(-70, 0, -30));
     this.florest.display();
     this.popMatrix()
 

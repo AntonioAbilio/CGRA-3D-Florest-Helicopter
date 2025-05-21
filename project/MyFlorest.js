@@ -17,8 +17,8 @@ export class MyFlorest extends CGFobject {
         this.num_columns = num_columns;
         this.scene = scene;
 
-        this.x_size = 100;
-        this.z_size = 100;
+        this.x_size = 60;
+        this.z_size = 60;
 
         // Generate random positions and parameters for trees
         this.trees = [];
@@ -54,8 +54,8 @@ export class MyFlorest extends CGFobject {
         let x = 0;
         let z = 0;
 
-        let spacing_x = this.x_size/this.num_columns;
-        let spacing_z = this.z_size/this.num_lines;
+        let spacing_x = this.x_size / this.num_columns;
+        let spacing_z = this.z_size / this.num_lines;
 
         for (let row = 0; row < this.num_lines; row++) {
             for (let col = 0; col < this.num_columns; col++) {
