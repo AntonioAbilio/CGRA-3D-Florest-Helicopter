@@ -8,13 +8,15 @@ import { CGFobject } from '../../lib/CGF.js';
  * @param radius - Radius of the sphere (default: 1)
  */
 export class MySphere extends CGFobject {
-    constructor(scene, slices, stacks, radius = 1) {
+    constructor(scene, slices, stacks, radius = 1, inside = true) {
         super(scene);
         this.slices = slices;
         this.stacks = stacks;
         this.radius = radius;
         this.center = [0, 0, 0]
         this.initBuffers();
+
+        this.inside = inside;
     }
 
     initBuffers() {
@@ -56,9 +58,16 @@ export class MySphere extends CGFobject {
                 let first = (latNumber * (this.slices + 1)) + longNumber;
                 let second = first + this.slices + 1;
 
-                // Create two triangles for each quad
-                this.indices.push(first, second, first + 1);
-                this.indices.push(second, second + 1, first + 1);
+                if(this.inside){
+
+                    this.indices.push(first, second, first + 1);
+                    this.indices.push(second, second + 1, first + 1);
+                }
+                else
+                {
+                    this.indices.push(first, first + 1, second);
+                    this.indices.push(second, first + 1, second + 1);
+                }
 
             }
         }

@@ -8,6 +8,7 @@ import { MyFlorest } from "./MyFlorest.js";
 import { MyHeli } from "./helicopter/MyHeli.js";
 
 import { MyFire } from "./MyFire.js";
+import { MyHeliLight } from "./MyHeliLight.js"; // no topo do ficheiro
 
 /**
  * MyScene
@@ -52,6 +53,7 @@ export class MyScene extends CGFscene {
     this.building = new MyBuilding(this, [0, 0, 0]);
     this.heli = new MyHeli(this, 0.0, 0.0, 0.0, 0, [0, 0, 0]);
     // TODO: remove and substitute for florest
+    
 
     this.displayTree = false;
     this.tree = new MyTree(this, this.treeSize, this.X_inclination, this.Z_inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
@@ -114,6 +116,9 @@ export class MyScene extends CGFscene {
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[0].enable();
     this.lights[0].update();
+
+
+
   }
 
   initCameras() {
@@ -188,6 +193,8 @@ export class MyScene extends CGFscene {
     this.checkKeys(deltaTime);
 
     this.heli.update(deltaTime);
+    
+    this.centerBuilding.update(t);
   }
 
   setDefaultAppearance() {
@@ -259,28 +266,6 @@ export class MyScene extends CGFscene {
     this.panorama.display();
     this.popMatrix();
 
-
-    // Display center tall building
-    this.pushMatrix();
-    this.translate(0, 10, 0);
-    this.scale(1.5, 2, 1.5); // Make center building taller
-    this.centerBuilding.display(); // Windows are automatically displayed with the building
-    this.popMatrix();
-
-    // Display left smaller building
-    this.pushMatrix();
-    this.translate(-13.5, 7.5, 0); // Position to the left
-    this.scale(1.2, 1.5, 1); // Make it smaller
-    this.leftBuilding.display(); // Windows are automatically displayed with the building
-    this.popMatrix();
-
-    // Display right smaller building
-    this.pushMatrix();
-    this.translate(13.5, 7.5, 0); // Position to the right
-    this.scale(1.2, 1.5, 1); // Make it smaller
-    this.rightBuilding.display(); // Windows are automatically displayed with the building
-    this.popMatrix();
-
     if (this.camera.position[1] < 0.0) this.camera.position[1] = 0.0;
 
     if (this.displayTree) {
@@ -303,10 +288,35 @@ export class MyScene extends CGFscene {
     this.fire.display();
     this.popMatrix();
 
+
+    // Display left smaller building
+    this.pushMatrix();
+    this.translate(-13.5, 7.5, 0); // Position to the left
+    this.scale(1.2, 1.5, 1); // Make it smaller
+    this.leftBuilding.display(); // Windows are automatically displayed with the building
+    this.popMatrix();
+
+    // Display right smaller building
+    this.pushMatrix();
+    this.translate(13.5, 7.5, 0); // Position to the right
+    this.scale(1.2, 1.5, 1); // Make it smaller
+    this.rightBuilding.display(); // Windows are automatically displayed with the building
+    this.popMatrix();
+
+      // Display center tall building
+    this.pushMatrix();
+    this.translate(0, 10, 0);
+    this.scale(1.5, 2, 1.5); // Make center building taller
+    this.centerBuilding.display(); // Windows are automatically displayed with the building
+    this.popMatrix();
+
+
     // Display ground
     this.pushMatrix();
     this.scale(400, 1, 400);
     this.rotate(-Math.PI / 2, 1, 0, 0);
+
+
 
     this.pushMatrix();
     this.appearance.apply();

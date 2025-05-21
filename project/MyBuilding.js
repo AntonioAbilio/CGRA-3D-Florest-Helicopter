@@ -2,6 +2,7 @@ import { CGFobject, CGFappearance } from '../lib/CGF.js';
 import { MyQuad } from './MyQuad.js';
 import { MyWindow } from './MyWindow.js';
 import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
+import { MyHeliLight } from "./MyHeliLight.js";
 
 /**
  * MyBuilding
@@ -37,6 +38,16 @@ export class MyBuilding extends CGFobject {
         
         // Create the window object
         this.window = new MyWindow(scene, windowTexture);
+
+        this.isCenterBuilding = (entrance === true);
+        if (this.isCenterBuilding) {
+            this.heliLights = [
+                new MyHeliLight(scene, -this.width/2 + 0.5, this.height/2 + 0.2, -this.depth/2 + 0.5),
+                new MyHeliLight(scene, this.width/2 - 0.5, this.height/2 + 0.2, -this.depth/2 + 0.5),
+                new MyHeliLight(scene, -this.width/2 + 0.5, this.height/2 + 0.2, this.depth/2 - 0.5),
+                new MyHeliLight(scene, this.width/2 - 0.5, this.height/2 + 0.2, this.depth/2 - 0.5),
+            ];
+        }
         
         // Initialize window properties
         this.initializeWindowProperties();
@@ -65,6 +76,11 @@ export class MyBuilding extends CGFobject {
         this.scene.popMatrix();
     }
     
+    update(t) {
+        if (this.isCenterBuilding) {
+            this.heliLights.forEach(light => light.update(t));
+        }
+    }
 
     displayFaceWindows(isFront) {
 
@@ -196,6 +212,10 @@ export class MyBuilding extends CGFobject {
         
         // Display windows on front face
         this.displayFaceWindows(true);
+
+        if (this.isCenterBuilding) {
+            this.heliLights.forEach(light => light.display());
+        }
     }
 
     changeTexFiltering(filter) {
