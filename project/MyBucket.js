@@ -17,6 +17,7 @@ export class MyBucket extends CGFobject {
         this.vertices = [];
         this.indices = [];
         this.normals = [];
+        this.texCoords = [];
 
         let ang = 0;
 
@@ -37,17 +38,23 @@ export class MyBucket extends CGFobject {
             normal[1] /= nsize;
             normal[2] /= nsize;
 
+            // Calculate texture coordinate s (horizontal)
+            let s = i / this.slices;
+
             // Bottom Left
             this.vertices.push(ca, sa, 1)
             this.normals.push(...normal);
+            this.texCoords.push(s, 0);
 
             let incrementForZAxis = 1 / (this.stacks)
             for (let j = 0; j < this.stacks; j++) {
 
                 this.vertices.push(ca, sa, incrementForZAxis);
-
-                // Push normal once for each vertex
                 this.normals.push(...normal);
+
+                // Calculate texture coordinate t based on height
+                let t = 1 - incrementForZAxis;
+                this.texCoords.push(s, t);
 
                 incrementForZAxis += 1 / (this.stacks)
             }
@@ -55,6 +62,7 @@ export class MyBucket extends CGFobject {
             // Bottom Right
             this.vertices.push(ca, sa, 0)
             this.normals.push(...normal);
+            this.texCoords.push(s, 1);
 
             if (i != 0) {
 

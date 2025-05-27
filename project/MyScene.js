@@ -136,6 +136,19 @@ export class MyScene extends CGFscene {
     this.movZ = value;
   }
 
+  checkIfInsideTheLake(position) {
+    // Lake parameters
+    const lakeCenter = { x: 82, z: 34 };
+    const lakeRadius = 45;
+
+    const dx = position[0] - lakeCenter.x;
+    const dz = position[2] - lakeCenter.z;
+    const distance = Math.sqrt(dx * dx + dz * dz);
+
+    // Return true if helicopter is inside lake
+    return distance < lakeRadius;
+  }
+
   getSpeedFactor() {
     return this.speedFactor;
   }
@@ -149,7 +162,7 @@ export class MyScene extends CGFscene {
 
   initCameras() {
     this.camera = new CGFcamera(
-      0.6,
+      2.0,
       0.9,
       1000,
       vec3.fromValues(-31, 56, -47),
@@ -295,7 +308,8 @@ export class MyScene extends CGFscene {
 
     // TODO: remove
     this.pushMatrix();
-    this.multMatrix(getTranslationMatrix(84, this.movY, 37));
+    /* this.multMatrix(getTranslationMatrix(84, this.movY, 37)); */
+    this.multMatrix(getTranslationMatrix(this.movX, this.movY, this.movZ));
     this.multMatrix(getScalingMatrix(0.5, 20, 0.5))
     this.altPlane.display();
     this.popMatrix();

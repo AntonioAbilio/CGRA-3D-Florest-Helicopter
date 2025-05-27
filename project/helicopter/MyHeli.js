@@ -1,6 +1,6 @@
 import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 import { MyHeliPrimitive } from './MyHeliPrimitive.js';
-import { getRad, getTranslationMatrix, getXRotationMatrix, getYRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
+import { getRad, getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getYRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
 import { Cube } from './Cube.js'
 import { MyBucket } from '../MyBucket.js';
 import { MyCircle } from '../MyCircle.js';
@@ -33,13 +33,20 @@ export class MyHeli extends CGFobject {
         this.bucket = new MyBucket(this.scene);
         this.bucketCover = new MyCircle(this.scene);
 
+        // Water
+        this.water = new MyBucket(this.scene);
+        this.waterTop = new MyCircle(this.scene);
+        this.waterBottom = new MyCircle(this.scene);
+
         // Helicopter's Functionality
-        // FIXME: Substitute this for a state machine...
         this.isFlying = false;
         this.ignoreInputs = false;
         this.readyToDescend = false;
+        this.readyToAscend = false;
         this.readyToLand = false;
         this.bucketOpen = false;
+        this.bucketFull = false;
+        this.firstTimeHere = true;
         this.autoPilotState = -1;
 
         // Helices's Position
@@ -67,9 +74,18 @@ export class MyHeli extends CGFobject {
         this.bodyWindow.setShininess(10.0);
         this.bodyWindow.loadTexture('textures/heli_window.jpg');
         this.bodyWindow.setTextureWrap('REPEAT', 'REPEAT');
+
+        this.waterTexture = new CGFappearance(this.scene);
+        this.waterTexture.setAmbient(0.9, 0.9, 0.9, 1);
+        this.waterTexture.setDiffuse(0.9, 0.9, 0.9, 1);
+        this.waterTexture.setSpecular(0.1, 0.1, 0.1, 1);
+        this.waterTexture.setShininess(10.0);
+        this.waterTexture.loadTexture('textures/waterTex.jpg');
+        this.waterTexture.setTextureWrap('REPEAT', 'REPEAT');
     }
 
     display() {
+
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(this.posX, this.posY, this.posZ));
         this.scene.multMatrix(getYRotationMatrix(180 + this.orientation));
@@ -78,10 +94,36 @@ export class MyHeli extends CGFobject {
         if (this.isFlying) {
             this.scene.pushMatrix();
             this.scene.multMatrix(getTranslationMatrix(0, 10, 0));
+            if (this.bucketFull) {
+
+                this.scene.pushMatrix()
+                this.scene.multMatrix(getXRotationMatrix(-180));
+                this.waterTexture.apply();
+                this.waterBottom.display();
+                this.scene.popMatrix();
+                this.scene.pushMatrix();
+
+                this.scene.multMatrix(getXRotationMatrix(-90));
+                this.waterTexture.apply();
+                this.bucket.display();
+                this.scene.popMatrix();
+
+                this.scene.pushMatrix()
+                this.scene.multMatrix(getScalingMatrix(1, 0.8, 1));
+                this.scene.multMatrix(getTranslationMatrix(0, 1, 0));
+                this.scene.multMatrix(getXRotationMatrix(180));
+                this.waterTexture.apply();
+                this.waterTop.display();
+                this.scene.popMatrix()
+
+            }
             this.scene.multMatrix(getXRotationMatrix(-90));
             this.bodyTexture.apply();
             this.bucket.display();
+
+
             this.scene.popMatrix();
+
 
             // Bucket Cover
             this.scene.pushMatrix();
@@ -288,15 +330,34 @@ export class MyHeli extends CGFobject {
 
         // User used the L key...
         if (this.readyToDescend) {
-
             // TODO: Need to do more verifications (See 4.3.2)
-            if (false) {
-                console.log("TODO: Check if above lake, above bulding, empty or full bucket...")
+
+            // If the user presses the L key on top of the lake then we will enter this and
+            // execute the instructions for the helicopter to descend.
+
+            // But in the case that the user did not press the button while on top of the lake
+            // this variable will be already false which means that the user intention was not to
+            // fill the bucket but intead to return to the building.
+            if (this.firstTimeHere && this.scene.checkIfInsideTheLake([this.posX, this.posY, this.posZ])) {
+                // If we hit the final state, pressing the L key does not do anything because the bucket is already full.
+                if (this.autoPilotState == -1) {
+                    this.autoPilotState = 6;
+                }
+
             } else {
                 // If we aren't top of the lake and on top of the bulding than we need to activate autopilot
                 if (this.autoPilotState == -1) {
                     this.autoPilotState = 0;
                 }
+            }
+            this.firstTimeHere = false;
+        }
+
+        // User used the P key...
+        if (this.readyToAscend) {
+            if (this.autoPilotState == 11) {
+                this.readyToDescend = false;
+                this.autoPilotState = 12;
             }
         }
 
@@ -324,7 +385,6 @@ export class MyHeli extends CGFobject {
         this.back_helice_1_ang %= 360;
         this.back_helice_2_ang %= 360;
 
-        // FIXME: WHY IS THIS HAPPENING ???
         this.top_helice_1_ang = isNaN(this.top_helice_1_ang) ? 0 : this.top_helice_1_ang;
         this.top_helice_2_ang = isNaN(this.top_helice_1_ang) ? 0 : this.top_helice_1_ang;
         this.back_helice_1_ang = isNaN(this.back_helice_1_ang) ? 0 : this.back_helice_1_ang;
@@ -335,13 +395,13 @@ export class MyHeli extends CGFobject {
         // Exit early if autopilot is not active
         if (this.autoPilotState < 0) return;
 
-        
+
         const rotationStep = 2 * this.scene.getSpeedFactor();
         const movementStep = 0.5 * this.scene.getSpeedFactor();
-        
+
         // Tolerances
         const posTolerance = 0.1;
-        const angleTolerance = 2;
+        const angleTolerance = 2 * this.scene.getSpeedFactor();
 
         // Helper function to normalize orientation to [-180, 180]
         const normalizeOrientation = (angle) => {
@@ -360,7 +420,6 @@ export class MyHeli extends CGFobject {
 
         switch (this.autoPilotState) {
             case 0: // Handle positive Z - rotate to 180 degrees and move to Z=0
-                console.log(0)
                 // If we're already in negative Z space, move to next state
                 if (this.posZ < -posTolerance) {
                     this.autoPilotState++;
@@ -374,7 +433,7 @@ export class MyHeli extends CGFobject {
                 } else {
                     this.posZ -= movementStep;
                     // If we've reached or passed Z=0, move to next state
-                    if (this.posZ <= posTolerance) {
+                    if (Math.floor(Math.abs(this.posZ)) == 0) {
                         this.posZ = 0.0;
                         this.autoPilotState++;
                     }
@@ -382,7 +441,6 @@ export class MyHeli extends CGFobject {
                 break;
 
             case 1: // Handle negative Z - rotate to 0 degrees and move to Z=0
-                console.log(1)
                 // If Z is already near 0, move to next state
                 if (Math.floor(Math.abs(this.posZ)) == 0.0) {
                     this.posZ = 0.0;
@@ -394,16 +452,14 @@ export class MyHeli extends CGFobject {
                 if (Math.abs(normalizeOrientation(this.orientation)) > angleTolerance) {
                     // Rotate toward 0 degrees
                     this.orientation += rotationStep * getRotationDirection(this.orientation, 0);
-                }
-                // If properly oriented, move forward
-                else {
+                } else {
+                     // If properly oriented, move forward
                     this.posZ += movementStep;
                 }
                 break;
 
             case 2: // Handle positive X - rotate to -90 or 270 degrees and move to X=0
                 // If we're already in negative X space, move to next state
-                console.log(2)
                 if (this.posX < -posTolerance) {
                     this.autoPilotState++;
                     break;
@@ -414,12 +470,11 @@ export class MyHeli extends CGFobject {
                     Math.abs(normalizeOrientation(this.orientation) - 270) > angleTolerance) {
                     // Rotate toward -90 degrees
                     this.orientation += rotationStep * getRotationDirection(this.orientation, -90);
-                }
-                // If properly oriented, move forward
-                else {
+                } else {
                     this.posX -= movementStep;
+
                     // If we've reached or passed X=0, move to next state
-                    if (this.posX <= posTolerance) {
+                    if (Math.floor(Math.abs(this.posX)) == 0) {
                         this.posX = 0.0;
                         this.autoPilotState++;
                     }
@@ -427,7 +482,6 @@ export class MyHeli extends CGFobject {
                 break;
 
             case 3: // Handle negative X - rotate to 90 degrees and move to X=0
-                console.log(3)
                 // If X is already near 0, move to next state
                 if (Math.floor(Math.abs(this.posX)) == 0.0) {
                     this.posX = 0.0;
@@ -439,15 +493,12 @@ export class MyHeli extends CGFobject {
                 if (Math.abs(normalizeOrientation(this.orientation) - 90) > angleTolerance) {
                     // Rotate toward 90 degrees
                     this.orientation += rotationStep * getRotationDirection(this.orientation, 90);
-                }
-                // If properly oriented, move forward
-                else {
+                } else {
                     this.posX += movementStep;
                 }
                 break;
-
             case 4: // Reset orientation to 0 degrees
-                console.log(4)
+
                 // If already at 0 orientation, move to landing state
                 if (Math.abs(normalizeOrientation(this.orientation)) < angleTolerance) {
                     this.orientation = 0;
@@ -461,24 +512,100 @@ export class MyHeli extends CGFobject {
                 break;
 
             case 5: // Land the helicopter
-                console.log(5)
                 if (this.posY <= 0.5) {
                     this.readyToLand = true;
                     this.autoPilotState = -1;
                 }
                 break;
+            case 6: // Handle Z > 34 - rotate to 180 degrees and move to Z=34
+                if (Math.floor(Math.abs(this.posZ)) <= 34.0) {
+                    this.autoPilotState++;
+                    break;
+                }
+
+                // Check if we need to rotate to 180 degrees
+                if (Math.abs(Math.abs(normalizeOrientation(this.orientation)) - 180) > angleTolerance) {
+                    this.orientation += rotationStep * getRotationDirection(this.orientation, 180);
+                } else {
+                    this.posZ -= movementStep;
+                    // If we've reached or passed Z=34, move to next state
+                    if (Math.floor(Math.abs(this.posZ)) == 34.0) {
+                        this.posZ = 34.0;
+                        this.autoPilotState++;
+                    }
+                }
+                break;
+            case 7: // Handle Z < 34 - rotate to 0 degrees and move to Z=34
+                if (Math.floor(Math.abs(this.posZ)) >= 34.0) {
+                    this.autoPilotState++;
+                    break;
+                }
+
+                // Check if we need to rotate to 0 degrees
+                if (Math.abs(normalizeOrientation(this.orientation)) > angleTolerance) {
+                    this.orientation += rotationStep * getRotationDirection(this.orientation, 0);
+                } else {
+                    this.posZ += movementStep;
+                }
+                break;
+            case 8: // Handle X > 82 - rotate to -90 or 270 degrees and move to X=82
+                if (Math.floor(Math.abs(this.posX)) <= 82.0) {
+                    this.autoPilotState++;
+                    break;
+                }
+
+                // Check if we need to rotate to -90 degrees
+                if (Math.abs(normalizeOrientation(this.orientation) - (-90)) > angleTolerance && Math.abs(normalizeOrientation(this.orientation) - 270) > angleTolerance) {
+                    this.orientation += rotationStep * getRotationDirection(this.orientation, -90);
+                } else {
+                    this.posX -= movementStep;
+
+                    if (Math.floor(Math.abs(this.posX)) == 82.0) {
+                        this.posX = 82.0;
+                        this.autoPilotState++;
+                    }
+                }
+                break;
+            case 9:  // Handle X < 82 - rotate to 90 degrees and move to X=82
+                if (Math.floor(Math.abs(this.posX)) >= 82.0) {
+                    this.posX = 82.0;
+                    this.autoPilotState++;
+                    break;
+                }
+
+                // Check if we need to rotate to 90 degrees
+                if (Math.abs(normalizeOrientation(this.orientation) - 90) > angleTolerance) {
+                    this.orientation += rotationStep * getRotationDirection(this.orientation, 90);
+                } else {
+                    this.posX += movementStep;
+                }
+                break;
+            case 10: // Lower the helicoper to capture the water
+                this.posY -= movementStep
+
+                if (this.posY < -10.0)
+                    this.autoPilotState++;
+                break;
+            case 11: // Capture the water
+                this.bucketFull = true; // Since we have touched the water our bucket will be filled.
+                this.ignoreInputs = false;
+                break;
+            case 12: // As soon as the user is ready to ascend, do it.
+                if (this.posY >= 10.0) {
+                    this.posY = 10.0;
+                    this.ignoreInputs = false;
+                    this.autoPilotState = -1;
+                    break;
+                }
+                this.posY += movementStep;
+
         }
     }
 
-
-
     update(delta) {
-        if (this.posY > 0.0) {
+        if (this.posY > 0.0 || this.isFlying) {
             this.updateHelices(delta);
         }
-
-        // TODO: remove
-        //console.log(`OR: ${this.orientation} X: ${this.posX} Y: ${this.posY} Z: ${this.posZ}`)
 
         // Update autopilot state. If it is set to -1 nothing will happen.
         this.autoPilotStateUpdate();
@@ -536,10 +663,16 @@ export class MyHeli extends CGFobject {
         this.readyToDescend = false;
         this.readyToLand = false;
         this.bucketOpen = false;
+        this.bucketFull = false;
+        this.readyToAscend = false;
+        this.firstTimeHere = true;
         this.autoPilotState = -1;
     }
 
     fly() {
+
+        // This may also indicate that the user has pressed the button to ascend.
+        this.readyToAscend = true;
 
         // Check if we are already flying and if we need to ignore inputs.
         if (this.isFlying || this.ignoreInputs) {
@@ -560,6 +693,8 @@ export class MyHeli extends CGFobject {
         if (!this.isFlying || this.ignoreInputs || this.readyToDescend) {
             return;
         }
+
+        this.readyToAscend = false;
 
         // Start the autopilot...
         this.readyToDescend = true;

@@ -17,6 +17,7 @@ export class MyCircle extends CGFobject {
         this.vertices = [];
         this.indices = [];
         this.normals = [];
+        this.texCoords = [];
 
         var ang = 0;
         var alphaAng = 2 * Math.PI / this.slices;
@@ -27,17 +28,20 @@ export class MyCircle extends CGFobject {
             this.indices.push(i, (i + 1) % this.slices, this.slices);
             this.indices.push(this.slices, (i + 1) % this.slices, i);
             this.normals.push(0, -1, 0);
+
+            // Texture coordinates for edge vertices
+            // Map from circle position to texture space
+            this.texCoords.push(0.5 + 0.5 * Math.cos(ang), 0.5 - 0.5 * Math.sin(ang));
+
             ang += alphaAng;
         }
         this.vertices.push(0, 0, 0);
         this.normals.push(0, -1, 0);
-        //this.normals.push(0, 1, 0);
 
+        // Texture coordinate for center (0.5, 0.5)
+        this.texCoords.push(0.5, 0.5);
 
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();
     }
-
 }
-
-
