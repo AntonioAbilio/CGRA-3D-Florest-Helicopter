@@ -8,6 +8,7 @@ import { MyFlorest } from "./MyFlorest.js";
 import { MyHeli } from "./helicopter/MyHeli.js";
 
 import { MyFire } from "./MyFire.js";
+import { MyHeliLight } from "./MyHeliLight.js";
 
 /**
  * MyScene
@@ -52,17 +53,17 @@ export class MyScene extends CGFscene {
     this.building = new MyBuilding(this, [0, 0, 0]);
     this.heli = new MyHeli(this, 0.0, 0.0, 0.0, 0, [0, 0, 0]);
     // TODO: remove and substitute for florest
+    
 
     this.displayTree = false;
     this.tree = new MyTree(this, this.treeSize, this.X_inclination, this.Z_inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
 
 
     this.fireTexture = new CGFtexture(this, "textures/fire.jpg");
-    this.fire = new MyFire(this, this.fireTexture, 4);
 
     this.forestLines = 5;
     this.forestColumns = 4;
-    this.florest = new MyFlorest(this, this.forestLines, this.forestColumns);
+    this.florest = new MyFlorest(this, this.forestLines, this.forestColumns, this.fireTexture);
     this.plane = new MyPlane(this, 64);
 
     // TODO: remove
@@ -72,6 +73,10 @@ export class MyScene extends CGFscene {
     this.movZ = 0.0;
 
     this.buildingTopTexture = new CGFtexture(this, "textures/buildingTop.png");
+
+    this.buildingTopDown = new CGFtexture(this, "textures/buildingTopDown.png");
+    this.buildingTopUp = new CGFtexture(this, "textures/buildingTopNew.png");
+
     this.buildingSideTexture = new CGFtexture(this, "textures/buildingSide.png");
     this.buildingFrontTexture = new CGFtexture(this, "textures/buildingSideFront.png");
     this.windowTexture = new CGFtexture(this, "textures/window.jpg");
@@ -84,7 +89,9 @@ export class MyScene extends CGFscene {
       this.buildingSideTexture,
       this.windowTexture,
       3,
-      true
+      true,
+      this.buildingTopDown,
+      this.buildingTopUp
     );
 
     this.leftBuilding = new MyBuilding(
@@ -158,6 +165,9 @@ export class MyScene extends CGFscene {
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[0].enable();
     this.lights[0].update();
+
+
+
   }
 
   initCameras() {
@@ -234,6 +244,8 @@ export class MyScene extends CGFscene {
     this.checkKeys(deltaTime);
 
     this.heli.update(deltaTime);
+    
+    this.centerBuilding.update(t);
   }
 
   setDefaultAppearance() {
@@ -305,35 +317,12 @@ export class MyScene extends CGFscene {
     this.panorama.display();
     this.popMatrix();
 
-
     // TODO: remove
     this.pushMatrix();
     /* this.multMatrix(getTranslationMatrix(84, this.movY, 37)); */
     this.multMatrix(getTranslationMatrix(this.movX, this.movY, this.movZ));
     this.multMatrix(getScalingMatrix(0.5, 20, 0.5))
     this.altPlane.display();
-    this.popMatrix();
-
-
-    // Display center tall building
-    this.pushMatrix();
-    this.translate(0, 10, 0);
-    this.scale(1.5, 2, 1.5); // Make center building taller
-    this.centerBuilding.display(); // Windows are automatically displayed with the building
-    this.popMatrix();
-
-    // Display left smaller building
-    this.pushMatrix();
-    this.translate(-13.5, 7.5, 0); // Position to the left
-    this.scale(1.2, 1.5, 1); // Make it smaller
-    this.leftBuilding.display(); // Windows are automatically displayed with the building
-    this.popMatrix();
-
-    // Display right smaller building
-    this.pushMatrix();
-    this.translate(13.5, 7.5, 0); // Position to the right
-    this.scale(1.2, 1.5, 1); // Make it smaller
-    this.rightBuilding.display(); // Windows are automatically displayed with the building
     this.popMatrix();
 
     if (this.camera.position[1] < 0.0) this.camera.position[1] = 0.0;
@@ -353,9 +342,27 @@ export class MyScene extends CGFscene {
 
     this.heli.display();
 
+
+    // Display left smaller building
     this.pushMatrix();
-    this.translate(0, 10, 30); // adjust as needed
-    this.fire.display();
+    this.translate(-13.5, 7.5, 0); // Position to the left
+    this.scale(1.2, 1.5, 1); // Make it smaller
+    this.leftBuilding.display(); // Windows are automatically displayed with the building
+    this.popMatrix();
+
+    // Display right smaller building
+    this.pushMatrix();
+    this.translate(13.5, 7.5, 0); // Position to the right
+    this.scale(1.2, 1.5, 1); // Make it smaller
+    this.rightBuilding.display(); // Windows are automatically displayed with the building
+    this.popMatrix();
+
+
+      // Display center tall building
+    this.pushMatrix();
+    this.translate(0, 10, 0);
+    this.scale(1.5, 2, 1.5); // Make center building taller
+    this.centerBuilding.display(); // Windows are automatically displayed with the building
     this.popMatrix();
 
 

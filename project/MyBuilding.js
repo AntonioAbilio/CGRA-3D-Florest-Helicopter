@@ -1,7 +1,9 @@
 import { CGFobject, CGFappearance } from '../lib/CGF.js';
+import { CGFshader} from '../lib/CGF.js';
 import { MyQuad } from './MyQuad.js';
 import { MyWindow } from './MyWindow.js';
 import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
+import { MyHeliLight } from "./MyHeliLight.js";
 
 /**
  * MyBuilding
@@ -17,7 +19,7 @@ import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './
  * @param depth - Depth of the building (defaults to 10)
  */
 export class MyBuilding extends CGFobject {
-    constructor(scene, topTexture, frontTexture, sideTexture, windowTexture, floors = 4, entrance = false, width = 10, height = 10, depth = 10) {
+    constructor(scene, topTexture, frontTexture, sideTexture, windowTexture, floors = 4, entrance = false, topTextureDown, topTextureUp) {
         super(scene);
         
         this.quad = new MyQuad(scene);
@@ -27,19 +29,43 @@ export class MyBuilding extends CGFobject {
         this.windowTexture = windowTexture;
         
         this.floors = floors;
-        this.width = width;
-        this.height = height;
-        this.depth = depth;
 
 		this.entrance = entrance;
         
         this.textureFiltering = this.scene.gl.NEAREST; // Default texture filtering
         
+        this.width = 10;
+        this.height = 10;
+        this.depth = 10;
+
         // Create the window object
         this.window = new MyWindow(scene, windowTexture);
+
+        this.isCenterBuilding = (entrance === true);
+        if (this.isCenterBuilding) {
+            this.heliLights = [
+                new MyHeliLight(scene, -this.width/2 + 0.5, this.height/2 + 0.2, -this.depth/2 + 0.5),
+                new MyHeliLight(scene, this.width/2 - 0.5, this.height/2 + 0.2, -this.depth/2 + 0.5),
+                new MyHeliLight(scene, -this.width/2 + 0.5, this.height/2 + 0.2, this.depth/2 - 0.5),
+                new MyHeliLight(scene, this.width/2 - 0.5, this.height/2 + 0.2, this.depth/2 - 0.5),
+            ];
+        }
         
         // Initialize window properties
         this.initializeWindowProperties();
+
+        
+        this.topShader = new CGFshader(this.scene.gl, "shaders/dynamicTop.vert", "shaders/dynamicTop.frag");
+        this.texSelector = 1; // Default texture selector
+
+        this.topShader.setUniformsValues({
+            uTex0: 0,
+            uTex1: 1,
+            uTex2: 2,
+            uTexSelector: 0
+        });
+        this.topTextureDown = topTextureDown;
+        this.topTextureUp = topTextureUp;
     }
     
 
@@ -56,6 +82,10 @@ export class MyBuilding extends CGFobject {
         this.windowMarginY = this.floorHeight * 0.2;
     }
 
+    setTopTextureSelector(selector) {
+        this.texSelector = selector;
+        this.topShader.setUniformsValues({ uTexSelector: this.texSelector });
+    }
    
     displayWindow(x, y, z) {
         this.scene.pushMatrix();
@@ -65,6 +95,11 @@ export class MyBuilding extends CGFobject {
         this.scene.popMatrix();
     }
     
+    update(t) {
+        if (this.isCenterBuilding) {
+            this.heliLights.forEach(light => light.update(t));
+        }
+    }
 
     displayFaceWindows(isFront) {
 
@@ -135,15 +170,50 @@ export class MyBuilding extends CGFobject {
     }
 
     display() {
-        // Top face of the building
-        this.scene.pushMatrix();
-        this.scene.translate(0, this.height/2, 0);
-        this.scene.rotate(-Math.PI/2, 1, 0, 0);
-        this.scene.scale(this.width, this.depth, 1);
-        this.topTexture.bind();
-        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
-        this.quad.display();
-        this.scene.popMatrix();
+
+        if(this.topTextureDown != null){
+            // Top face using shader
+            this.scene.pushMatrix();
+            this.scene.translate(0, this.height/2, 0);
+            this.scene.rotate(-Math.PI/2, 1, 0, 0);
+            this.scene.scale(this.width, this.depth, 1);
+
+            // Activate shader and bind textures
+            this.scene.setActiveShader(this.topShader);
+
+            this.scene.gl.activeTexture(this.scene.gl.TEXTURE0);
+            this.topTexture.bind(0);
+
+            this.scene.gl.activeTexture(this.scene.gl.TEXTURE1);
+            this.topTextureDown.bind(1);
+
+            this.scene.gl.activeTexture(this.scene.gl.TEXTURE2);
+            this.topTextureUp.bind(2);
+
+            this.setTopTextureSelector(0);
+
+            // Draw the quad with shader
+            this.quad.display();
+
+            // Reset shader
+            this.scene.setActiveShader(this.scene.defaultShader);
+            this.scene.popMatrix();
+        }
+        else
+        {
+            // Top face of the building
+            this.scene.pushMatrix();
+            this.scene.translate(0, this.height/2, 0);
+            this.scene.rotate(-Math.PI/2, 1, 0, 0);
+            this.scene.scale(this.width, this.depth, 1);
+            this.topTexture.bind();
+            this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+            this.quad.display();
+            this.scene.popMatrix();
+
+        }
+
+
 
         // Front face of the building
         this.scene.pushMatrix();
@@ -196,6 +266,10 @@ export class MyBuilding extends CGFobject {
         
         // Display windows on front face
         this.displayFaceWindows(true);
+
+        if (this.isCenterBuilding) {
+            this.heliLights.forEach(light => light.display());
+        }
     }
 
     changeTexFiltering(filter) {
