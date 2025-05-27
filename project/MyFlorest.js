@@ -10,7 +10,7 @@ import { getTranslationMatrix } from './utils/utils.js';
  * @param num_columns - number of columns
 */
 export class MyFlorest extends CGFobject {
-    constructor(scene, num_lines, num_columns) {
+    constructor(scene, num_lines, num_columns, fireTexture) {
         super(scene);
 
         this.num_lines = num_lines;
@@ -23,6 +23,8 @@ export class MyFlorest extends CGFobject {
         // Generate random positions and parameters for trees
         this.trees = [];
         this.treePositions = [];
+
+        this.fireTexture = fireTexture;
 
         this.update(num_columns, num_lines);
 
@@ -61,7 +63,7 @@ export class MyFlorest extends CGFobject {
             for (let col = 0; col < this.num_columns; col++) {
 
                 // Store the tree and its position
-                this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632));
+                this.trees.push(new MyTree(this.scene, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632, this.fireTexture));
                 this.treePositions.push({
                     x: x,
                     z: z

@@ -2,6 +2,7 @@ import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 import { MyLeaves } from './MyLeaves.js';
 import { getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
 import { MyTrunk } from './MyTrunk.js';
+import { MyFire } from '../MyFire.js';
 
 /**
 * MyTree
@@ -12,7 +13,7 @@ import { MyTrunk } from './MyTrunk.js';
  * @param trunkRadius - number of divisions along the Y axis
 */
 export class MyTree extends CGFobject {
-    constructor(scene, treeSize, X_inclination, Z_inclination, trunkRadius, leavesRGB) {
+    constructor(scene, treeSize, X_inclination, Z_inclination, trunkRadius, leavesRGB, fireTexture) {
         super(scene);
 
         if (treeSize < 2) {
@@ -39,6 +40,19 @@ export class MyTree extends CGFobject {
         // Trunk
         this.trunk = new MyTrunk(this.scene, 20, 20, this.trunk_radius, this.max_visible_size_for_trunk + 1);
 
+        this.fire = new MyFire(scene, fireTexture, 3); // Adjust scale if needed
+        this.fire_pos = Math.random();
+
+        const randomAngle = Math.random() * 2 * Math.PI;
+        const cos = Math.cos(randomAngle);
+        const sin = Math.sin(randomAngle);
+
+        this.yRotationMatrix = [
+            cos, 0, -sin, 0,
+            0,   1,   0,  0,
+            sin, 0,  cos, 0,
+            0,   0,   0,  1
+        ];
 
     }
 
@@ -58,11 +72,18 @@ export class MyTree extends CGFobject {
         for (let i = 0; i < amount_of_leaves; i++) {
             this.scene.pushMatrix();
             this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * i), 0));
+            this.scene.scale(1 * ((amount_of_leaves - i)/amount_of_leaves), 1.5, 1 * ((amount_of_leaves - i)/amount_of_leaves)); // Make it smaller
             this.leavesMaterial.apply();
             this.leaves.display();
             this.scene.popMatrix();
 
         }
+        this.scene.popMatrix();
+
+        this.scene.pushMatrix();
+            this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * amount_of_leaves) * this.fire_pos, 0));
+            this.scene.multMatrix(this.yRotationMatrix);
+            this.fire.display();
         this.scene.popMatrix();
 
     }

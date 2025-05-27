@@ -60,14 +60,17 @@ export class MyScene extends CGFscene {
 
 
     this.fireTexture = new CGFtexture(this, "textures/fire.jpg");
-    this.fire = new MyFire(this, this.fireTexture, 4);
 
     this.forestLines = 5;http://127.0.0.1:5500/project/
     this.forestColumns = 4;
-    this.florest = new MyFlorest(this, this.forestLines, this.forestColumns);
+    this.florest = new MyFlorest(this, this.forestLines, this.forestColumns, this.fireTexture);
     this.plane = new MyPlane(this, 64);
 
     this.buildingTopTexture = new CGFtexture(this, "textures/buildingTop.png");
+
+    this.buildingTopDown = new CGFtexture(this, "textures/buildingTopDown.png");
+    this.buildingTopUp = new CGFtexture(this, "textures/buildingTopNew.png");
+
     this.buildingSideTexture = new CGFtexture(this, "textures/buildingSide.png");
     this.buildingFrontTexture = new CGFtexture(this, "textures/buildingSideFront.png");
     this.windowTexture = new CGFtexture(this, "textures/window.jpg");
@@ -80,7 +83,9 @@ export class MyScene extends CGFscene {
       this.buildingSideTexture,
       this.windowTexture,
       3,
-      true
+      true,
+      this.buildingTopDown,
+      this.buildingTopUp
     );
 
     this.leftBuilding = new MyBuilding(
@@ -283,11 +288,6 @@ export class MyScene extends CGFscene {
 
     this.heli.display();
 
-    this.pushMatrix();
-    this.translate(0, 10, 30); // adjust as needed
-    this.fire.display();
-    this.popMatrix();
-
 
     // Display left smaller building
     this.pushMatrix();
@@ -302,6 +302,7 @@ export class MyScene extends CGFscene {
     this.scale(1.2, 1.5, 1); // Make it smaller
     this.rightBuilding.display(); // Windows are automatically displayed with the building
     this.popMatrix();
+
 
       // Display center tall building
     this.pushMatrix();
