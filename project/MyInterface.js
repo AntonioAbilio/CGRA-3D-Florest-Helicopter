@@ -46,6 +46,11 @@ export class MyInterface extends CGFinterface {
         f1.add(this.scene, 'forestLines', 4, 10).name("Number of Lines").onChange(this.scene.updateForestLines.bind(this.scene));
         f1.add(this.scene, 'forestColumns', 5, 10).name("Number of Columns").onChange(this.scene.updateForestColumns.bind(this.scene));
 
+        // TODO: remove
+        var f2 = this.gui.addFolder('Debug Settings');
+        f2.add(this.scene, 'movX', 0.0, 100.0).name("X_pos_tracer").onChange(this.scene.updateMovX.bind(this.scene));
+        f2.add(this.scene, 'movY', 0.0, 100.0).name("Y_pos_tracer").onChange(this.scene.updateMovY.bind(this.scene));
+        f2.add(this.scene, 'movZ', 0.0, 100.0).name("Z_pos_tracer").onChange(this.scene.updateMovZ.bind(this.scene));
 
         // disable the processKeyboard function
         this.processKeyboard = function () { };

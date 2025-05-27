@@ -1,6 +1,6 @@
-import { CGFscene, CGFappearance, CGFcamera, CGFaxis, CGFtexture } from "../lib/CGF.js";
+import { CGFscene, CGFappearance, CGFcamera, CGFaxis, CGFtexture, CGFshader } from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
-import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
+import { getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
 import { MyBuilding } from './MyBuilding.js';
 import { MyPanorama } from "./MyPanorama.js";
 import { MyTree } from "./tree/MyTree.js";
@@ -60,10 +60,16 @@ export class MyScene extends CGFscene {
     this.fireTexture = new CGFtexture(this, "textures/fire.jpg");
     this.fire = new MyFire(this, this.fireTexture, 4);
 
-    this.forestLines = 5;http://127.0.0.1:5500/project/
+    this.forestLines = 5;
     this.forestColumns = 4;
     this.florest = new MyFlorest(this, this.forestLines, this.forestColumns);
     this.plane = new MyPlane(this, 64);
+
+    // TODO: remove
+    this.altPlane = new MyPlane(this, 64);
+    this.movX = 0.0;
+    this.movY = 0.0;
+    this.movZ = 0.0;
 
     this.buildingTopTexture = new CGFtexture(this, "textures/buildingTop.png");
     this.buildingSideTexture = new CGFtexture(this, "textures/buildingSide.png");
@@ -105,8 +111,33 @@ export class MyScene extends CGFscene {
     this.grass = new CGFtexture(this, "textures/grass.jpg");
     this.appearance = new CGFappearance(this);
     this.appearance.setTexture(this.grass);
-    this.appearance.setTextureWrap('REPEAT', 'REPEAT');
+    //this.appearance.setTextureWrap('REPEAT', 'REPEAT');
 
+    this.waterTex = new CGFtexture(this, "textures/waterTex.jpg");
+    this.waterMap = new CGFtexture(this, "textures/waterMap.png");
+    this.waterShader = new CGFshader(this.gl, "shaders/water.vert", "shaders/water.frag");
+
+
+    this.waterShader.setUniformsValues({
+      uSampler: 0,
+      uSampler2: 1,
+      uSampler3: 2,
+      timeFactor: 0
+    })
+  }
+
+  updateMovX(value) {
+    this.movX = value;
+  }
+  updateMovY(value) {
+    this.movY = value;
+  }
+  updateMovZ(value) {
+    this.movZ = value;
+  }
+
+  getSpeedFactor() {
+    return this.speedFactor;
   }
 
   initLights() {
@@ -175,15 +206,17 @@ export class MyScene extends CGFscene {
     if (keysPressed) console.log(text);
   }
 
-  update(t) {
+  update(time) {
+
+    this.waterShader.setUniformsValues({ timeFactor: time / 1000 % 1000 });
 
     if (this.prevTime === 0) {
-      this.prevTime = t;
+      this.prevTime = time;
       return; // Skip first frame
     }
 
-    const deltaTime = (t - this.prevTime) / 1000;
-    this.prevTime = t;
+    const deltaTime = (time - this.prevTime) / 1000;
+    this.prevTime = time;
 
     this.checkKeys(deltaTime);
 
@@ -260,6 +293,14 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
 
+    // TODO: remove
+    this.pushMatrix();
+    this.multMatrix(getTranslationMatrix(84, this.movY, 37));
+    this.multMatrix(getScalingMatrix(0.5, 20, 0.5))
+    this.altPlane.display();
+    this.popMatrix();
+
+
     // Display center tall building
     this.pushMatrix();
     this.translate(0, 10, 0);
@@ -303,14 +344,18 @@ export class MyScene extends CGFscene {
     this.fire.display();
     this.popMatrix();
 
+
     // Display ground
     this.pushMatrix();
     this.scale(400, 1, 400);
     this.rotate(-Math.PI / 2, 1, 0, 0);
-
-    this.pushMatrix();
+    this.setActiveShader(this.waterShader);
+    this.grass.bind(0);
+    this.waterMap.bind(1);
+    this.waterTex.bind(2);
     this.appearance.apply();
     this.plane.display();
+    this.setActiveShader(this.defaultShader);
     this.popMatrix();
 
   }

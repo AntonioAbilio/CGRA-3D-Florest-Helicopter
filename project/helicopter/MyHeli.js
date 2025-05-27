@@ -332,123 +332,142 @@ export class MyHeli extends CGFobject {
     }
 
     autoPilotStateUpdate() {
+        // Exit early if autopilot is not active
+        if (this.autoPilotState < 0) return;
+
+        
+        const rotationStep = 2 * this.scene.getSpeedFactor();
+        const movementStep = 0.5 * this.scene.getSpeedFactor();
+        
+        // Tolerances
+        const posTolerance = 0.1;
+        const angleTolerance = 2;
+
+        // Helper function to normalize orientation to [-180, 180]
+        const normalizeOrientation = (angle) => {
+            let result = angle % 360;
+            if (result > 180) result -= 360;
+            if (result < -180) result += 360;
+            return result;
+        };
+
+        // Helper function to get shortest rotation direction
+        const getRotationDirection = (current, target) => {
+            const normalized = normalizeOrientation(current);
+            const diff = normalizeOrientation(target - normalized);
+            return diff > 0 ? 1 : -1;
+        };
 
         switch (this.autoPilotState) {
-            case 0: // We are dealing with positive Z
-                if (this.posZ < 0.0) {
+            case 0: // Handle positive Z - rotate to 180 degrees and move to Z=0
+                console.log(0)
+                // If we're already in negative Z space, move to next state
+                if (this.posZ < -posTolerance) {
                     this.autoPilotState++;
                     break;
                 }
 
-                if (this.posZ > 0.0) {
-
-                    if (this.orientation == 180 || this.orientation == -180) {
-                        this.posZ -= 1.0;
-                    } else {
-
-                        if (this.orientation <= 0) {
-                            this.orientation--;
-                        }
-
-                        if (this.orientation > 0) {
-                            this.orientation++;
-                        }
-
-                    }
+                // Check if we need to rotate to 180 degrees
+                if (Math.abs(Math.abs(normalizeOrientation(this.orientation)) - 180) > angleTolerance) {
+                    // Rotate toward 180 degrees
+                    this.orientation += rotationStep * getRotationDirection(this.orientation, 180);
                 } else {
+                    this.posZ -= movementStep;
+                    // If we've reached or passed Z=0, move to next state
+                    if (this.posZ <= posTolerance) {
+                        this.posZ = 0.0;
+                        this.autoPilotState++;
+                    }
+                }
+                break;
+
+            case 1: // Handle negative Z - rotate to 0 degrees and move to Z=0
+                console.log(1)
+                // If Z is already near 0, move to next state
+                if (Math.floor(Math.abs(this.posZ)) == 0.0) {
                     this.posZ = 0.0;
                     this.autoPilotState++;
+                    break;
+                }
+
+                // Check if we need to rotate to 0 degrees
+                if (Math.abs(normalizeOrientation(this.orientation)) > angleTolerance) {
+                    // Rotate toward 0 degrees
+                    this.orientation += rotationStep * getRotationDirection(this.orientation, 0);
+                }
+                // If properly oriented, move forward
+                else {
+                    this.posZ += movementStep;
                 }
                 break;
-            case 1: // We are dealing with negative Z
-                if (this.posZ < 0.0) {
 
-                    if (this.orientation == 0) {
-                        this.posZ += 1.0;
-                    } else {
-
-                        if (this.orientation > 0) {
-                            this.orientation--
-                        }
-
-                        if (this.orientation <= 0) {
-                            this.orientation++
-                        }
-
-                    }
-                } else {
-                    this.autoPilotState++;
-                }
-                break;
-            case 2: // We are dealing with positive X
-                if (this.posX < 0.0) {
+            case 2: // Handle positive X - rotate to -90 or 270 degrees and move to X=0
+                // If we're already in negative X space, move to next state
+                console.log(2)
+                if (this.posX < -posTolerance) {
                     this.autoPilotState++;
                     break;
                 }
 
-                if (this.posX > 0.0) {
-
-                    if (this.orientation == 270 || this.orientation == -90) {
-                        this.posX -= 1.0;
-                    } else {
-
-                        if (this.orientation <= 0) {
-                            this.orientation--;
-                        }
-
-                        if (this.orientation > 0) {
-                            this.orientation++;
-                        }
-
+                // Check if we need to rotate to -90 degrees
+                if (Math.abs(normalizeOrientation(this.orientation) - (-90)) > angleTolerance &&
+                    Math.abs(normalizeOrientation(this.orientation) - 270) > angleTolerance) {
+                    // Rotate toward -90 degrees
+                    this.orientation += rotationStep * getRotationDirection(this.orientation, -90);
+                }
+                // If properly oriented, move forward
+                else {
+                    this.posX -= movementStep;
+                    // If we've reached or passed X=0, move to next state
+                    if (this.posX <= posTolerance) {
+                        this.posX = 0.0;
+                        this.autoPilotState++;
                     }
-                } else {
+                }
+                break;
+
+            case 3: // Handle negative X - rotate to 90 degrees and move to X=0
+                console.log(3)
+                // If X is already near 0, move to next state
+                if (Math.floor(Math.abs(this.posX)) == 0.0) {
                     this.posX = 0.0;
                     this.autoPilotState++;
+                    break;
+                }
+
+                // Check if we need to rotate to 90 degrees
+                if (Math.abs(normalizeOrientation(this.orientation) - 90) > angleTolerance) {
+                    // Rotate toward 90 degrees
+                    this.orientation += rotationStep * getRotationDirection(this.orientation, 90);
+                }
+                // If properly oriented, move forward
+                else {
+                    this.posX += movementStep;
                 }
                 break;
-            case 3: // We are dealing with negative X
-                if (this.posX < 0.0) {
 
-                    if (this.orientation == 90 || this.orientation == -270) {
-                        this.posX += 1.0;
-                    } else {
-
-                        if (this.orientation <= 0) {
-                            this.orientation--;
-                        }
-
-                        if (this.orientation > 0) {
-                            this.orientation++;
-                        }
-
-                    }
-                } else {
-                    this.posX = 0.0;
+            case 4: // Reset orientation to 0 degrees
+                console.log(4)
+                // If already at 0 orientation, move to landing state
+                if (Math.abs(normalizeOrientation(this.orientation)) < angleTolerance) {
+                    this.orientation = 0;
                     this.autoPilotState++;
-                }
-                break;
-            case 4: // Reset the orientation to be the initial one.
-                if (this.orientation < 0) {
-                    this.orientation++;
-                } else {
-                    this.orientation--;
+                    this.velocity_vec3[1] -= this.scene.baseAcceleration; // Apply downward velocity
+                    break;
                 }
 
-                if (this.orientation == 0) {
-                    this.autoPilotState++;
-                    this.velocity_vec3[1] -= this.scene.baseAcceleration; // Apply the velocity
-                }
+                // Rotate toward 0 degrees
+                this.orientation += rotationStep * getRotationDirection(this.orientation, 0);
                 break;
-            case 5:
+
+            case 5: // Land the helicopter
+                console.log(5)
                 if (this.posY <= 0.5) {
                     this.readyToLand = true;
                     this.autoPilotState = -1;
                 }
                 break;
-            default: // Autopilot is not active
-                break;
         }
-
     }
 
 
@@ -479,7 +498,7 @@ export class MyHeli extends CGFobject {
     }
 
     accelarate(t) {
-        if (this.ignoreInputs) {
+        if (this.ignoreInputs || !this.isFlying) {
             return;
         }
 
