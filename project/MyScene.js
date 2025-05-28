@@ -6,6 +6,7 @@ import { MyPanorama } from "./MyPanorama.js";
 import { MyTree } from "./tree/MyTree.js";
 import { MyFlorest } from "./MyFlorest.js";
 import { MyHeli } from "./helicopter/MyHeli.js";
+import { MyBuildings } from "./MyBuildings.js";
 
 import { MyFire } from "./MyFire.js";
 import { MyHeliLight } from "./MyHeliLight.js"; // no topo do ficheiro
@@ -67,7 +68,6 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 64);
 
     this.buildingTopTexture = new CGFtexture(this, "textures/buildingTop.png");
-
     this.buildingTopDown = new CGFtexture(this, "textures/buildingTopDown.png");
     this.buildingTopUp = new CGFtexture(this, "textures/buildingTopNew.png");
 
@@ -75,35 +75,14 @@ export class MyScene extends CGFscene {
     this.buildingFrontTexture = new CGFtexture(this, "textures/buildingSideFront.png");
     this.windowTexture = new CGFtexture(this, "textures/window.jpg");
 
-    // Create three buildings with different sizes and number of floors
-    this.centerBuilding = new MyBuilding(
-      this,
-      this.buildingTopTexture,
+    this.building = new MyBuildings(
+      this, 
+      this.buildingTopTexture, 
+      this.buildingTopDown, 
+      this.buildingTopUp,
       this.buildingFrontTexture,
       this.buildingSideTexture,
-      this.windowTexture,
-      3,
-      true,
-      this.buildingTopDown,
-      this.buildingTopUp
-    );
-
-    this.leftBuilding = new MyBuilding(
-      this,
-      this.buildingSideTexture,
-      this.buildingSideTexture,
-      this.buildingSideTexture,
-      this.windowTexture,
-      2
-    );
-
-    this.rightBuilding = new MyBuilding(
-      this,
-      this.buildingSideTexture,
-      this.buildingSideTexture,
-      this.buildingSideTexture,
-      this.windowTexture,
-      2  // 5 floors for right building
+      this.windowTexture
     );
 
     this.tree = new MyTree(this, 6, 1, 20, this.inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
@@ -121,8 +100,6 @@ export class MyScene extends CGFscene {
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[0].enable();
     this.lights[0].update();
-
-
 
   }
 
@@ -199,7 +176,7 @@ export class MyScene extends CGFscene {
 
     this.heli.update(deltaTime);
     
-    this.centerBuilding.update(t);
+    this.building.update(t);
   }
 
   setDefaultAppearance() {
@@ -260,11 +237,6 @@ export class MyScene extends CGFscene {
 
     this.setDefaultAppearance();
 
-    // Initialize buffers for all buildings
-    this.centerBuilding.initBuffers();
-    this.leftBuilding.initBuffers();
-    this.rightBuilding.initBuffers();
-
     let trMatrix = getTranslationMatrix(...this.camera.position);
     this.pushMatrix();
     this.multMatrix(trMatrix);
@@ -289,27 +261,7 @@ export class MyScene extends CGFscene {
     this.heli.display();
 
 
-    // Display left smaller building
-    this.pushMatrix();
-    this.translate(-13.5, 7.5, 0); // Position to the left
-    this.scale(1.2, 1.5, 1); // Make it smaller
-    this.leftBuilding.display(); // Windows are automatically displayed with the building
-    this.popMatrix();
-
-    // Display right smaller building
-    this.pushMatrix();
-    this.translate(13.5, 7.5, 0); // Position to the right
-    this.scale(1.2, 1.5, 1); // Make it smaller
-    this.rightBuilding.display(); // Windows are automatically displayed with the building
-    this.popMatrix();
-
-
-      // Display center tall building
-    this.pushMatrix();
-    this.translate(0, 10, 0);
-    this.scale(1.5, 2, 1.5); // Make center building taller
-    this.centerBuilding.display(); // Windows are automatically displayed with the building
-    this.popMatrix();
+    this.building.display();
 
 
     // Display ground

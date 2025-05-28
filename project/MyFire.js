@@ -9,6 +9,31 @@ export class MyFire extends CGFobject {
 
         this.shader = new CGFshader(scene.gl, "shaders/fire.vert", "shaders/fire.frag");
         this.shader.setUniformsValues({ uSampler: 0 });
+
+        this.fire_offset = Math.random() * 50;
+    }
+
+
+    subdivideTriangle(tri) {
+        // tri is an array of 9 numbers: [Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz]
+
+        // Extract vertices
+        const A = tri.slice(0, 3);
+        const B = tri.slice(3, 6);
+        const C = tri.slice(6, 9);
+
+        // Midpoints of each edge
+        const AB = A.map((v, i) => (v + B[i]) / 2);
+        const BC = B.map((v, i) => (v + C[i]) / 2);
+        const CA = C.map((v, i) => (v + A[i]) / 2);
+
+        // Return 4 new triangles, each 9 elements long
+        return [
+            [...A, ...AB, ...CA], // Triangle 1: A, AB, CA
+            [...AB, ...B, ...BC], // Triangle 2: AB, B, BC
+            [...CA, ...BC, ...C], // Triangle 3: CA, BC, C
+            [...AB, ...BC, ...CA] // Triangle 4: center triangle formed by midpoints
+        ];
     }
 
     initBuffers() {
@@ -27,6 +52,12 @@ export class MyFire extends CGFobject {
             [0.0, height * 1.15, 0.25 * this.scale, -0.4 * base, 0.0, 0.2 * this.scale, 0.4 * base, 0.0, 0.2 * this.scale]
         ];
 
+        let subdividedVerts = [];
+        for (const tri of verts) {
+            const subs = this.subdivideTriangle(tri);
+            subdividedVerts.push(...subs);
+        }
+
         this.vertices = [];
         this.indices = [];
         this.normals = [];
@@ -35,7 +66,7 @@ export class MyFire extends CGFobject {
         const tex = [0.5, 0.0, 0.0, 1.0, 1.0, 1.0];
 
         let idx = 0;
-        for (let v of verts) {
+        for (let v of subdividedVerts) {
             // Front face
             this.vertices.push(...v);
             this.indices.push(idx, idx + 1, idx + 2);

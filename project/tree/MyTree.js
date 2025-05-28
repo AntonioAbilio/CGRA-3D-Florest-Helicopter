@@ -40,19 +40,22 @@ export class MyTree extends CGFobject {
         // Trunk
         this.trunk = new MyTrunk(this.scene, 20, 20, this.trunk_radius, this.max_visible_size_for_trunk + 1);
 
-        this.fire = new MyFire(scene, fireTexture, 3); // Adjust scale if needed
-        this.fire_pos = Math.random();
+        if(0.2 < Math.random()){
 
-        const randomAngle = Math.random() * 2 * Math.PI;
-        const cos = Math.cos(randomAngle);
-        const sin = Math.sin(randomAngle);
+            this.fire = new MyFire(scene, fireTexture, 3); // Adjust scale if needed
+            this.fire_pos = Math.random();
 
-        this.yRotationMatrix = [
-            cos, 0, -sin, 0,
-            0,   1,   0,  0,
-            sin, 0,  cos, 0,
-            0,   0,   0,  1
-        ];
+            const randomAngle = Math.random() * 2 * Math.PI;
+            const cos = Math.cos(randomAngle);
+            const sin = Math.sin(randomAngle);
+
+            this.yRotationMatrix = [
+                cos, 0, -sin, 0,
+                0,   1,   0,  0,
+                sin, 0,  cos, 0,
+                0,   0,   0,  1
+            ];
+        }
 
     }
 
@@ -80,11 +83,13 @@ export class MyTree extends CGFobject {
         }
         this.scene.popMatrix();
 
-        this.scene.pushMatrix();
-            this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * amount_of_leaves) * this.fire_pos, 0));
-            this.scene.multMatrix(this.yRotationMatrix);
-            this.fire.display();
-        this.scene.popMatrix();
+        if(this.fire){
+            this.scene.pushMatrix();
+                this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * amount_of_leaves) * this.fire_pos, 0));
+                this.scene.multMatrix(this.yRotationMatrix);
+                this.fire.display();
+            this.scene.popMatrix();
+        }
 
     }
 
