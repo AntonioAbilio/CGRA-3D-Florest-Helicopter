@@ -1,8 +1,9 @@
 import { CGFobject, CGFappearance } from '../../lib/CGF.js';
-import { MyLeaves } from './MyLeaves.js';
+
 import { getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
 import { MyTrunk } from './MyTrunk.js';
 import { MyFire } from '../MyFire.js';
+import { MyPyramid } from '../MyPyramid.js';
 
 /**
 * MyTree
@@ -13,7 +14,7 @@ import { MyFire } from '../MyFire.js';
  * @param trunkRadius - number of divisions along the Y axis
 */
 export class MyTree extends CGFobject {
-    constructor(scene, treeSize, X_inclination, Z_inclination, trunkRadius, leavesRGB, fireTexture) {
+    constructor(scene, treeSize, X_inclination, Z_inclination, trunkRadius, leavesRGB, fireTexture, displayFire) {
         super(scene);
 
         if (treeSize < 2) {
@@ -35,12 +36,13 @@ export class MyTree extends CGFobject {
         this.leavesMaterial.setDiffuse((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
         //this.leavesMaterial.setShininess((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
         this.leavesMaterial.setAmbient((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
-        this.leaves = new MyLeaves(this.scene, leavesRGB, this.leaves_base_radius);
+        this.leaves = new MyPyramid(this.scene, leavesRGB, this.leaves_base_radius, 'textures/leaves.jpg');
 
         // Trunk
         this.trunk = new MyTrunk(this.scene, 20, 20, this.trunk_radius, this.max_visible_size_for_trunk + 1);
 
-        this.fire = new MyFire(scene, fireTexture, 3); // Adjust scale if needed
+        this.displayFire = displayFire;
+        this.fire = new MyFire(scene, fireTexture, 3);
         this.fire_pos = Math.random();
 
         const randomAngle = Math.random() * 2 * Math.PI;
@@ -49,9 +51,9 @@ export class MyTree extends CGFobject {
 
         this.yRotationMatrix = [
             cos, 0, -sin, 0,
-            0,   1,   0,  0,
-            sin, 0,  cos, 0,
-            0,   0,   0,  1
+            0, 1, 0, 0,
+            sin, 0, cos, 0,
+            0, 0, 0, 1
         ];
 
     }
@@ -72,7 +74,7 @@ export class MyTree extends CGFobject {
         for (let i = 0; i < amount_of_leaves; i++) {
             this.scene.pushMatrix();
             this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * i), 0));
-            this.scene.scale(1 * ((amount_of_leaves - i)/amount_of_leaves), 1.5, 1 * ((amount_of_leaves - i)/amount_of_leaves)); // Make it smaller
+            this.scene.scale(1 * ((amount_of_leaves - i) / amount_of_leaves), 1.5, 1 * ((amount_of_leaves - i) / amount_of_leaves)); // Make it smaller
             this.leavesMaterial.apply();
             this.leaves.display();
             this.scene.popMatrix();
@@ -80,12 +82,26 @@ export class MyTree extends CGFobject {
         }
         this.scene.popMatrix();
 
-        this.scene.pushMatrix();
+        if (this.displayFire) {
+            this.scene.pushMatrix();
             this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * amount_of_leaves) * this.fire_pos, 0));
             this.scene.multMatrix(this.yRotationMatrix);
             this.fire.display();
-        this.scene.popMatrix();
+            this.scene.popMatrix();
+        }
 
+    }
+
+    isOnFire() {
+        return this.displayFire;
+    }
+
+    disableFire() {
+        this.displayFire = false;
+    }
+
+    enableFire() {
+        this.displayFire = true;
     }
 
     updateAmountOfLeaves(treeSize) {

@@ -44,6 +44,8 @@ export class MyScene extends CGFscene {
     this.rotationAxis = false;
     this.trunkRadius = 1.5;
     this.leavesRGB = 0x184632;
+    this.raindropSize = 1;
+    this.raindropFreq = 1;
 
     this.enableTextures(true);
     this.setUpdatePeriod(50);
@@ -52,12 +54,6 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 200);
     this.building = new MyBuilding(this, [0, 0, 0]);
     this.heli = new MyHeli(this, 0.0, 0.0, 0.0, 0, [0, 0, 0]);
-    // TODO: remove and substitute for florest
-    
-
-    this.displayTree = false;
-    this.tree = new MyTree(this, this.treeSize, this.X_inclination, this.Z_inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
-
 
     this.fireTexture = new CGFtexture(this, "textures/fire.jpg");
 
@@ -112,7 +108,8 @@ export class MyScene extends CGFscene {
       2  // 5 floors for right building
     );
 
-    this.tree = new MyTree(this, 6, 1, 20, this.inclination, this.rotationAxis, this.trunkRadius, this.leavesRGB);
+    this.displayTree = false;
+    this.tree = new MyTree(this, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632, false);
     this.panorama = new MyPanorama(this, new CGFtexture(this, "textures/panorama.jpg"));
 
     this.grass = new CGFtexture(this, "textures/grass.jpg");
@@ -165,14 +162,11 @@ export class MyScene extends CGFscene {
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[0].enable();
     this.lights[0].update();
-
-
-
   }
 
   initCameras() {
     this.camera = new CGFcamera(
-      2.0,
+      90.0,
       0.9,
       1000,
       vec3.fromValues(-31, 56, -47),
@@ -225,6 +219,12 @@ export class MyScene extends CGFscene {
       this.heli.stopFlying();
     }
 
+    if (this.gui.isKeyPressed("KeyO")) {
+      text += " O ";
+      keysPressed = true;
+      this.heli.openBucket();
+    }
+
 
     if (keysPressed) console.log(text);
   }
@@ -244,8 +244,8 @@ export class MyScene extends CGFscene {
     this.checkKeys(deltaTime);
 
     this.heli.update(deltaTime);
-    
-    this.centerBuilding.update(t);
+
+    this.centerBuilding.update(time);
   }
 
   setDefaultAppearance() {
@@ -334,11 +334,7 @@ export class MyScene extends CGFscene {
       this.popMatrix();
     }
 
-    this.pushMatrix();
-    this.multMatrix(getYRotationMatrix(90));
-    this.multMatrix(getTranslationMatrix(-70, 0, -30));
     this.florest.display();
-    this.popMatrix()
 
     this.heli.display();
 
@@ -358,7 +354,7 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
 
-      // Display center tall building
+    // Display center tall building
     this.pushMatrix();
     this.translate(0, 10, 0);
     this.scale(1.5, 2, 1.5); // Make center building taller

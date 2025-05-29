@@ -4,6 +4,7 @@ import { getRad, getScalingMatrix, getTranslationMatrix, getXRotationMatrix, get
 import { Cube } from './Cube.js'
 import { MyBucket } from '../MyBucket.js';
 import { MyCircle } from '../MyCircle.js';
+import { MyPyramid } from '../MyPyramid.js';
 
 /**
  * MyHeli
@@ -37,6 +38,9 @@ export class MyHeli extends CGFobject {
         this.water = new MyBucket(this.scene);
         this.waterTop = new MyCircle(this.scene);
         this.waterBottom = new MyCircle(this.scene);
+        this.lastTimeWaterDropCreated = 0;
+        this.waterBucketState = 0;
+        this.waterDrops = [];
 
         // Helicopter's Functionality
         this.isFlying = false;
@@ -45,7 +49,6 @@ export class MyHeli extends CGFobject {
         this.readyToAscend = false;
         this.readyToLand = false;
         this.bucketOpen = false;
-        this.bucketFull = false;
         this.firstTimeHere = true;
         this.autoPilotState = -1;
 
@@ -86,6 +89,14 @@ export class MyHeli extends CGFobject {
 
     display() {
 
+        for (let idx = 0; idx < this.waterDrops.length; idx++) {
+            this.scene.pushMatrix();
+            this.scene.multMatrix(getTranslationMatrix(this.waterDrops.at(idx).currentPosition[0], this.waterDrops.at(idx).currentPosition[1], this.waterDrops.at(idx).currentPosition[2]));
+            this.scene.multMatrix(getScalingMatrix(0.3, 0.5, 0.3))
+            this.waterDrops.at(idx).waterDrop.display();
+            this.scene.popMatrix();
+        }
+
         this.scene.pushMatrix();
         this.scene.multMatrix(getTranslationMatrix(this.posX, this.posY, this.posZ));
         this.scene.multMatrix(getYRotationMatrix(180 + this.orientation));
@@ -94,7 +105,7 @@ export class MyHeli extends CGFobject {
         if (this.isFlying) {
             this.scene.pushMatrix();
             this.scene.multMatrix(getTranslationMatrix(0, 10, 0));
-            if (this.bucketFull) {
+            if (this.waterBucketState >= 1) {
 
                 this.scene.pushMatrix()
                 this.scene.multMatrix(getXRotationMatrix(-180));
@@ -453,7 +464,7 @@ export class MyHeli extends CGFobject {
                     // Rotate toward 0 degrees
                     this.orientation += rotationStep * getRotationDirection(this.orientation, 0);
                 } else {
-                     // If properly oriented, move forward
+                    // If properly oriented, move forward
                     this.posZ += movementStep;
                 }
                 break;
@@ -587,7 +598,7 @@ export class MyHeli extends CGFobject {
                     this.autoPilotState++;
                 break;
             case 11: // Capture the water
-                this.bucketFull = true; // Since we have touched the water our bucket will be filled.
+                this.waterBucketState = 1; // Since we have touched the water our bucket will be filled.
                 this.ignoreInputs = false;
                 break;
             case 12: // As soon as the user is ready to ascend, do it.
@@ -598,14 +609,64 @@ export class MyHeli extends CGFobject {
                     break;
                 }
                 this.posY += movementStep;
+                break;
+        }
 
+        // TODO: remove
+        console.log(this.autoPilotState)
+
+        this.velocity_vec3 = [0.0, this.velocity_vec3[1], 0.0];
+        this.inclination = 0;
+    }
+
+    updateAnimations() {
+        if (this.posY > 0.0 || this.isFlying) {
+            this.updateHelices(delta);
+
+            // We can only toggle between the "H" and the "UP" textures when we actually take off from the bulding.
+            if (!this.readyToDescend && this.waterBucketState == 0) {
+                if (this.posY < 9.0) {
+                    if (!this.lastTextureToggleTime) {
+                        this.lastTextureToggleTime = 0;
+                    }
+
+                    const currentTime = performance.now();
+
+                    if (currentTime - this.lastTextureToggleTime >= 150) {
+                        this.scene.centerBuilding.toggleUpTexture();
+                        this.lastTextureToggleTime = currentTime;
+                    }
+                } else {
+                    this.scene.centerBuilding.setTopTextureSelector(0);
+                }
+            }
+        }
+
+        if (this.autoPilotState >= 0 && this.autoPilotState <= 5) {
+            if (this.posY > 1.0) {
+                if (!this.lastTextureToggleTime) {
+                    this.lastTextureToggleTime = 0;
+                }
+
+                const currentTime = performance.now();
+
+                if (currentTime - this.lastTextureToggleTime >= 200) {
+                    this.scene.centerBuilding.toggleDownTexture();
+                    this.lastTextureToggleTime = currentTime;
+                }
+            } else {
+                this.scene.centerBuilding.setTopTextureSelector(0);
+            }
         }
     }
 
     update(delta) {
-        if (this.posY > 0.0 || this.isFlying) {
-            this.updateHelices(delta);
-        }
+        // Controlls whether the building shows "UP", "DOWN" or "H" texture.
+        // Also controlls the propellers of the helicopter.
+        this.updateAnimations();
+
+        // State machine that updates the bucket.
+        this.updateBucketState();
 
         // Update autopilot state. If it is set to -1 nothing will happen.
         this.autoPilotStateUpdate();
@@ -618,6 +679,7 @@ export class MyHeli extends CGFobject {
 
         // Keep the orientation between (-360 and 360).
         this.orientation %= 360;
+
     }
 
     turn(v) {
@@ -663,7 +725,8 @@ export class MyHeli extends CGFobject {
         this.readyToDescend = false;
         this.readyToLand = false;
         this.bucketOpen = false;
-        this.bucketFull = false;
+        this.waterBucketState = 0;
+        this.waterDrops = [];
         this.readyToAscend = false;
         this.firstTimeHere = true;
         this.autoPilotState = -1;
@@ -672,6 +735,7 @@ export class MyHeli extends CGFobject {
     fly() {
 
         // This may also indicate that the user has pressed the button to ascend.
+        // This is mostly for the case where the helicopter went down to get water and is now trying to fly up again.
         this.readyToAscend = true;
 
         // Check if we are already flying and if we need to ignore inputs.
@@ -701,6 +765,58 @@ export class MyHeli extends CGFobject {
 
         // Prevent interactions with the helicopter while its taking off or desending.
         this.ignoreInputs = true;
+    }
+
+    updateBucketState() {
+        switch (this.waterBucketState) {
+            case 0: // Bucket is empty and need to be filled
+                break;
+            case 1: // Bucket is full
+                break;
+            case 2: // The user wants to drop the water to extinguish the fire.
+                this.readyToDescend = false; // While we are dropping the water the helicopeter cannot descend.
+                if (!this.lastTimeWaterDropCreated) {
+                    this.lastTimeWaterDropCreated = 0;
+                }
+
+                const currentTime = performance.now();
+
+                if (currentTime - this.lastTimeWaterDropCreated >= (1 / this.scene.raindropFreq) * 1000) {
+                    console.log("Water drop created")
+                    this.waterDrops.push({
+                        waterDrop: new MyPyramid(this.scene, 0xffffff, this.scene.raindropSize, 'textures/waterTex.jpg'), currentPosition: [this.posX, this.posY + 10, this.posZ]
+                    });
+                    this.lastTimeWaterDropCreated = currentTime;
+                }
+
+                for (let idx = 0; idx < this.waterDrops.length; idx++) {
+                    let newWaterX = this.waterDrops.at(idx).currentPosition[0];
+                    let newWaterY = this.waterDrops.at(idx).currentPosition[1] - 1;
+                    let newWaterZ = this.waterDrops.at(idx).currentPosition[2];
+                    this.waterDrops.at(idx).currentPosition = [newWaterX, newWaterY, newWaterZ];
+                    this.scene.florest.stopFire([newWaterX, newWaterY, newWaterZ]);
+                }
+
+                break;
+            case 3: // After releasing the water drops the bucket will be empty again
+                this.waterBucketState = 0;
+                this.bucketOpen = false;
+                this.waterDrops = [];
+                // Excluding the reset only when we drop the water that we have can we go back to the lake to pick up more.
+                this.firstTimeHere = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    openBucket() {
+
+        if (this.waterBucketState == 1 && this.scene.florest.checkIfHelicopterInside([this.posX, this.posY, this.posZ])) {
+            this.waterBucketState = 2; // Let's let the water fall out.
+            this.bucketOpen = true;
+        }
+
     }
 
 }
