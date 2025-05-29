@@ -619,7 +619,7 @@ export class MyHeli extends CGFobject {
         this.inclination = 0;
     }
 
-    updateAnimations() {
+    updateAnimations(delta) {
         if (this.posY > 0.0 || this.isFlying) {
             this.updateHelices(delta);
 
@@ -633,11 +633,11 @@ export class MyHeli extends CGFobject {
                     const currentTime = performance.now();
 
                     if (currentTime - this.lastTextureToggleTime >= 150) {
-                        this.scene.centerBuilding.toggleUpTexture();
+                        this.scene.buildings.centerBuilding.toggleUpTexture();
                         this.lastTextureToggleTime = currentTime;
                     }
                 } else {
-                    this.scene.centerBuilding.setTopTextureSelector(0);
+                    this.scene.buildings.centerBuilding.setTopTextureSelector(0);
                 }
             }
         }
@@ -651,11 +651,11 @@ export class MyHeli extends CGFobject {
                 const currentTime = performance.now();
 
                 if (currentTime - this.lastTextureToggleTime >= 200) {
-                    this.scene.centerBuilding.toggleDownTexture();
+                    this.scene.buildings.centerBuilding.toggleDownTexture();
                     this.lastTextureToggleTime = currentTime;
                 }
             } else {
-                this.scene.centerBuilding.setTopTextureSelector(0);
+                this.scene.buildings.centerBuilding.setTopTextureSelector(0);
             }
         }
     }
@@ -663,7 +663,7 @@ export class MyHeli extends CGFobject {
     update(delta) {
         // Controlls whether the building shows "UP", "DOWN" or "H" texture.
         // Also controlls the propellers of the helicopter.
-        this.updateAnimations();
+        this.updateAnimations(delta);
 
         // State machine that updates the bucket.
         this.updateBucketState();

@@ -1,6 +1,6 @@
 import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 
-import { getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
+import { getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getYRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
 import { MyTrunk } from './MyTrunk.js';
 import { MyFire } from '../MyFire.js';
 import { MyPyramid } from '../MyPyramid.js';
@@ -42,19 +42,15 @@ export class MyTree extends CGFobject {
         this.trunk = new MyTrunk(this.scene, 20, 20, this.trunk_radius, this.max_visible_size_for_trunk + 1);
 
         this.displayFire = displayFire;
-        this.fire = new MyFire(scene, fireTexture, 3);
-        this.fire_pos = Math.random();
 
-        const randomAngle = Math.random() * 2 * Math.PI;
-        const cos = Math.cos(randomAngle);
-        const sin = Math.sin(randomAngle);
-
-        this.yRotationMatrix = [
-            cos, 0, -sin, 0,
-            0, 1, 0, 0,
-            sin, 0, cos, 0,
-            0, 0, 0, 1
-        ];
+        // This means that the probability of a tree not having fire is aproximatly 20%
+        if (Math.random() > 0.8) {
+            this.displayFire = false;
+        } else {
+            this.fire = new MyFire(scene, fireTexture, 3);
+            this.fire_pos = Math.random();
+            this.yRotationMatrix = getYRotationMatrix(Math.random())
+        }
 
     }
 

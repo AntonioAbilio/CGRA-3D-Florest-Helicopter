@@ -19,7 +19,7 @@ import { MyHeliLight } from "./MyHeliLight.js";
  * @param depth - Depth of the building (defaults to 10)
  */
 export class MyBuilding extends CGFobject {
-    constructor(scene, topTexture, frontTexture, sideTexture, windowTexture, floors = 4, entrance = false, topTextureDown, topTextureUp) {
+    constructor(scene, topTexture, frontTexture, sideTexture, windowTexture, width = 10, height = 10, depth = 10, floors = 4, entrance = false, topTextureDown = null, topTextureUp = null) {
         super(scene);
 
         this.quad = new MyQuad(scene);
@@ -29,15 +29,13 @@ export class MyBuilding extends CGFobject {
         this.windowTexture = windowTexture;
 
         this.floors = floors;
-
-        this.entrance = entrance;
-
+		this.entrance = entrance;
+        
         this.textureFiltering = this.scene.gl.NEAREST; // Default texture filtering
-        this.toggle = false;
-
-        this.width = 10;
-        this.height = 10;
-        this.depth = 10;
+        
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
 
         // Create the window object
         this.window = new MyWindow(scene, windowTexture);
@@ -55,7 +53,6 @@ export class MyBuilding extends CGFobject {
         // Initialize window properties
         this.initializeWindowProperties();
 
-
         this.topShader = new CGFshader(this.scene.gl, "shaders/dynamicTop.vert", "shaders/dynamicTop.frag");
         this.texSelector = 1; // Default texture selector
 
@@ -72,8 +69,8 @@ export class MyBuilding extends CGFobject {
 
     initializeWindowProperties() {
         // Calculate floor height
-        this.floorHeight = this.height / this.floors;
-
+        this.floorHeight = ((this.height - (this.entrance ? 5 : 0)) / this.floors);
+        
         // Window dimensions - proportional to building size
         this.windowWidth = this.width * 0.2;
         this.windowHeight = this.floorHeight * 0.6;
@@ -139,8 +136,8 @@ export class MyBuilding extends CGFobject {
         }
 
         // Calculate center position for the first floor
-        const firstFloorY = -this.height / 2 + this.floorHeight / 2;
-
+        const firstFloorY = this.height/2 - (this.entrance ? -this.floorHeight/4 : this.floorHeight/2);
+        
         // Place windows on each floor
         for (let floor = 0; floor < this.floors; floor++) {
 
