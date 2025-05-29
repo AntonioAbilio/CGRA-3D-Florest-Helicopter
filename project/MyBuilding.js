@@ -23,24 +23,41 @@ export class MyBuilding extends CGFobject {
         super(scene);
 
         this.quad = new MyQuad(scene);
-        this.topTexture = topTexture;
-        this.frontTexture = frontTexture;
-        this.sideTexture = sideTexture;
-        this.windowTexture = windowTexture;
+        this.window = new MyWindow(scene, windowTexture);
 
-        this.floors = floors;
-		this.entrance = entrance;
-        
-        this.textureFiltering = this.scene.gl.NEAREST; // Default texture filtering
-        
         this.width = width;
         this.height = height;
         this.depth = depth;
-
-        // Create the window object
-        this.window = new MyWindow(scene, windowTexture);
-
+        this.floors = floors;
+        this.entrance = entrance;
         this.isCenterBuilding = (entrance === true);
+        this.textureFiltering = this.scene.gl.NEAREST;
+
+        // Default white color
+        const white = [1.0, 1.0, 1.0, 1.0];
+
+        // MATERIALS
+        this.topMaterial = new CGFappearance(scene);
+        this.topMaterial.setTexture(topTexture);
+        this.topMaterial.setAmbient(...white);
+        this.topMaterial.setDiffuse(...white);
+        this.topMaterial.setSpecular(0.1, 0.1, 0.1, 1.0);
+        this.topMaterial.setShininess(10);
+
+        this.frontMaterial = new CGFappearance(scene);
+        this.frontMaterial.setTexture(frontTexture);
+        this.frontMaterial.setAmbient(...white);
+        this.frontMaterial.setDiffuse(...white);
+        this.frontMaterial.setSpecular(0.1, 0.1, 0.1, 1.0);
+        this.frontMaterial.setShininess(10);
+
+        this.sideMaterial = new CGFappearance(scene);
+        this.sideMaterial.setTexture(sideTexture);
+        this.sideMaterial.setAmbient(...white);
+        this.sideMaterial.setDiffuse(...white);
+        this.sideMaterial.setSpecular(0.1, 0.1, 0.1, 1.0);
+        this.sideMaterial.setShininess(10);
+
         if (this.isCenterBuilding) {
             this.heliLights = [
                 new MyHeliLight(scene, -this.width / 2 + 0.5, this.height / 2 + 0.2, -this.depth / 2 + 0.5),
@@ -50,11 +67,10 @@ export class MyBuilding extends CGFobject {
             ];
         }
 
-        // Initialize window properties
         this.initializeWindowProperties();
 
         this.topShader = new CGFshader(this.scene.gl, "shaders/dynamicTop.vert", "shaders/dynamicTop.frag");
-        this.texSelector = 1; // Default texture selector
+        this.texSelector = 1;
 
         this.topShader.setUniformsValues({
             uTex0: 0,
@@ -62,14 +78,33 @@ export class MyBuilding extends CGFobject {
             uTex2: 2,
             uTexSelector: 0
         });
+
+        this.topTexture = topTexture;
         this.topTextureDown = topTextureDown;
         this.topTextureUp = topTextureUp;
     }
 
 
+    setBuildingColor(hexColor) {
+        // Extract RGB components from hexColor (0xRRGGBB)
+        const r = ((hexColor >> 16) & 0xFF) / 255;
+        const g = ((hexColor >> 8) & 0xFF) / 255;
+        const b = (hexColor & 0xFF) / 255;
+        const a = 1.0;
+
+        const materials = [this.topMaterial, this.frontMaterial, this.sideMaterial];
+
+        for (let material of materials) {
+            material.setAmbient(r, g, b, a);
+            material.setDiffuse(r, g, b, a);
+            material.setSpecular(0.1, 0.1, 0.1, a);
+            material.setShininess(10);
+        }
+    }
+
     initializeWindowProperties() {
         // Calculate floor height
-        this.floorHeight = ((this.height - (this.entrance ? 5 : 0)) / this.floors);
+        this.floorHeight = (this.height / this.floors);
         
         // Window dimensions - proportional to building size
         this.windowWidth = this.width * 0.2;
@@ -135,11 +170,13 @@ export class MyBuilding extends CGFobject {
             this.scene.rotate(rotation, 0, 1, 0);
         }
 
+        console.log(this.height);
+
         // Calculate center position for the first floor
-        const firstFloorY = this.height/2 - (this.entrance ? -this.floorHeight/4 : this.floorHeight/2);
+        const firstFloorY = 0;
         
         // Place windows on each floor
-        for (let floor = 0; floor < this.floors; floor++) {
+        for (let floor = 0; floor < this.floors - this.entrance; floor++) {
 
             if (floor == 0 && this.entrance) continue;
 
@@ -156,45 +193,13 @@ export class MyBuilding extends CGFobject {
         this.scene.popMatrix();
     }
 
-    displaySideWindows(isRight) {
-        // Position for the side face
-        const posX = isRight ? this.width / 2 + 0.01 : -this.width / 2 - 0.01;
-        // Rotation for the side face
-        const rotation = isRight ? Math.PI / 2 : -Math.PI / 2;
-
-        this.scene.pushMatrix();
-
-        // Apply rotation for the side face
-        this.scene.rotate(rotation, 0, 1, 0);
-
-        // Calculate center position for the first floor
-        const firstFloorY = -this.height / 2 + this.floorHeight / 2;
-
-        // Place windows on each floor
-        for (let floor = 0; floor < this.floors; floor++) {
-            // Calculate Y position for this floor
-            const floorY = firstFloorY + floor * this.floorHeight;
-
-            // Side face - left window
-            this.displayWindow(-this.depth / 4, floorY, posX);
-
-            // Side face - right window
-            this.displayWindow(this.depth / 4, floorY, posX);
-        }
-
-        this.scene.popMatrix();
-    }
-
     display() {
-
         if (this.topTextureDown != null) {
-            // Top face using shader
             this.scene.pushMatrix();
-            this.scene.translate(0, this.height / 2, 0);
+            this.scene.translate(0, this.height/2, 0);
             this.scene.rotate(-Math.PI / 2, 1, 0, 0);
             this.scene.scale(this.width, this.depth, 1);
 
-            // Activate shader and bind textures
             this.scene.setActiveShader(this.topShader);
 
             this.scene.gl.activeTexture(this.scene.gl.TEXTURE0);
@@ -206,79 +211,66 @@ export class MyBuilding extends CGFobject {
             this.scene.gl.activeTexture(this.scene.gl.TEXTURE2);
             this.topTextureUp.bind(2);
 
+            this.topMaterial.apply();
 
-            // Draw the quad with shader
             this.quad.display();
 
-            // Reset shader
             this.scene.setActiveShader(this.scene.defaultShader);
             this.scene.popMatrix();
-        }
-        else {
-            // Top face of the building
+        } else {
             this.scene.pushMatrix();
-            this.scene.translate(0, this.height / 2, 0);
+            this.scene.translate(0, this.height/2, 0);
             this.scene.rotate(-Math.PI / 2, 1, 0, 0);
             this.scene.scale(this.width, this.depth, 1);
-            this.topTexture.bind();
-            this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+            this.topMaterial.apply();
             this.quad.display();
             this.scene.popMatrix();
-
         }
 
-
-
-        // Front face of the building
+        // Front
         this.scene.pushMatrix();
         this.scene.translate(0, 0, this.depth / 2);
         this.scene.scale(this.width, this.height, 1);
-        this.frontTexture.bind();
-        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.frontMaterial.apply();
         this.quad.display();
         this.scene.popMatrix();
 
-        // Back face of the building
+        // Back
         this.scene.pushMatrix();
         this.scene.translate(0, 0, -this.depth / 2);
         this.scene.rotate(Math.PI, 0, 1, 0);
         this.scene.scale(this.width, this.height, 1);
-        this.sideTexture.bind(); // Using front texture for back as well for consistency
-        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.sideMaterial.apply();
         this.quad.display();
         this.scene.popMatrix();
 
-        // Right face of the building
+        // Right
         this.scene.pushMatrix();
         this.scene.translate(this.width / 2, 0, 0);
         this.scene.rotate(Math.PI / 2, 0, 1, 0);
         this.scene.scale(this.depth, this.height, 1);
-        this.sideTexture.bind();
-        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.sideMaterial.apply();
         this.quad.display();
         this.scene.popMatrix();
 
-        // Left face of the building
+        // Left
         this.scene.pushMatrix();
         this.scene.translate(-this.width / 2, 0, 0);
         this.scene.rotate(-Math.PI / 2, 0, 1, 0);
         this.scene.scale(this.depth, this.height, 1);
-        this.sideTexture.bind();
-        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.sideMaterial.apply();
         this.quad.display();
         this.scene.popMatrix();
 
-        // Bottom face of the building
+        // Bottom
         this.scene.pushMatrix();
         this.scene.translate(0, -this.height / 2, 0);
         this.scene.rotate(Math.PI / 2, 1, 0, 0);
         this.scene.scale(this.width, this.depth, 1);
-        this.topTexture.bind(); // Using top texture for bottom as well
-        this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
+        this.topMaterial.apply(); // reuse top material
         this.quad.display();
         this.scene.popMatrix();
 
-        // Display windows on front face
         this.displayFaceWindows(true);
 
         if (this.isCenterBuilding) {

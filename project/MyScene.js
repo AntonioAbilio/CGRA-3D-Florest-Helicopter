@@ -48,6 +48,10 @@ export class MyScene extends CGFscene {
     this.raindropSize = 1;
     this.raindropFreq = 1;
 
+    //Building
+
+    this.buildingColor = 0xffffff;
+
     this.enableTextures(true);
     this.setUpdatePeriod(50);
 
@@ -87,6 +91,10 @@ export class MyScene extends CGFscene {
       this.windowTexture
     );
 
+    this.buildingWidth = 1;
+    this.floorCount = 4;
+    this.windowCount = 2;
+
     this.displayTree = false;
     this.tree = new MyTree(this, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632, false);
     this.panorama = new MyPanorama(this, new CGFtexture(this, "textures/panorama.jpg"));
@@ -117,6 +125,10 @@ export class MyScene extends CGFscene {
   }
   updateMovZ(value) {
     this.movZ = value;
+  }
+
+  updateBuildingWidth(wid){
+    this.buildingWidth = wid;
   }
 
   checkIfInsideTheLake(position) {
@@ -234,6 +246,18 @@ export class MyScene extends CGFscene {
     this.setShininess(10.0);
   }
 
+  updateBuildingColor(color){
+    this.buildings.updateColor(color);
+  }
+
+  updateFloorCount(count){
+    this.buildings.updateFloorCount(count);
+  }
+
+  updateFloorWindowCount(count){
+    this.buildings.updateFloorWindowCount(count);
+  }
+
   updateAmountOfLeaves(newSize) {
     this.tree.updateAmountOfLeaves(newSize)
   }
@@ -312,7 +336,10 @@ export class MyScene extends CGFscene {
 
     this.heli.display();
 
+    this.pushMatrix();
+    this.multMatrix(getScalingMatrix(this.buildingWidth, 1, 1))
     this.buildings.display();
+    this.popMatrix();
 
 
     // Display ground

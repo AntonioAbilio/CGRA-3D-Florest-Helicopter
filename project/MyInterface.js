@@ -56,6 +56,13 @@ export class MyInterface extends CGFinterface {
         f3.add(this.scene, 'raindropSize', 1.0, 10.0).name("Raindrop size").onChange(this.scene.updateMovX.bind(this.scene));
         f3.add(this.scene, 'raindropFreq', 1.0, 10.0).name("Raindrop freq.").onChange(this.scene.updateMovX.bind(this.scene));
 
+        var f4 = this.gui.addFolder('Buildings');
+
+        f4.add(this.scene, 'buildingWidth', 0.0, 5.0).name("Building Width").onChange(this.scene.updateBuildingWidth.bind(this.scene));
+        f4.add(this.scene, 'floorCount', 1, 8).name("Floor Count").onChange(this.scene.updateFloorCount.bind(this.scene));~
+        f4.add(this.scene, 'windowCount', 1, 8).name("Floor Window Count").onChange(this.scene.updateFloorWindowCount.bind(this.scene));
+        f4.addColor(this.scene, 'buildingColor').onChange(this.scene.updateBuildingColor.bind(this.scene));
+
         // disable the processKeyboard function
         this.processKeyboard = function () { };
 

@@ -87,12 +87,27 @@ export class MyBuildings extends CGFobject {
         this.rightBuilding.display(); // Windows are automatically displayed with the building
         this.scene.popMatrix();
 
-
         // Display center tall building
         this.scene.pushMatrix();
         this.scene.translate(0, 10, 0);
         this.centerBuilding.display(); // Windows are automatically displayed with the building
         this.scene.popMatrix();
+    }
+
+    updateColor(color){
+        this.leftBuilding.setBuildingColor(color)
+        this.centerBuilding.setBuildingColor(color)
+        this.rightBuilding.setBuildingColor(color)
+    }
+
+    updateFloorWindowCount(count){
+        
+    }
+
+    updateFloorCount(count){
+
+        this.leftBuilding.floors = count;
+        this.rightBuilding.floors = count;
     }
 
 }
