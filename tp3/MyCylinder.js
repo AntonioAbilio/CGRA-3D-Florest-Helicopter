@@ -22,7 +22,6 @@ export class MyCylinder extends CGFobject {
         // This variable will allow us do slice the circle.
         let alphaAng = 2 * Math.PI / this.slices;
 
-        // TODO: implement stacks...
         let numberOfVertexes = this.stacks;
 
         // We're using the trigonometric circle to calculate the point where a vertex should be.

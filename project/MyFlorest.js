@@ -90,7 +90,6 @@ export class MyFlorest extends CGFobject {
     }
 
     stopFire(waterDropPosition) {
-        // TODO:
 
         let isFireExtinguished = true;
         // Considering that the center is the water drop's position

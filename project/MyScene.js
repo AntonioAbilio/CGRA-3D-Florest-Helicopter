@@ -67,12 +67,6 @@ export class MyScene extends CGFscene {
     this.florest = new MyFlorest(this, this.forestLines, this.forestColumns, this.fireTexture);
     this.plane = new MyPlane(this, 64);
 
-    // TODO: remove
-    this.altPlane = new MyPlane(this, 64);
-    this.movX = 0.0;
-    this.movY = 0.0;
-    this.movZ = 0.0;
-
     this.buildingTopTexture = new CGFtexture(this, "textures/buildingTop.png");
     this.buildingTopDown = new CGFtexture(this, "textures/buildingTopDown.png");
     this.buildingTopUp = new CGFtexture(this, "textures/buildingTopNew.png");
@@ -80,11 +74,19 @@ export class MyScene extends CGFscene {
     this.buildingSideTexture = new CGFtexture(this, "textures/buildingSide.png");
     this.buildingFrontTexture = new CGFtexture(this, "textures/buildingSideFront.png");
 
-    this.windowTexture1 = new CGFtexture(this, "textures/window.jpg");
-    this.windowTexture2 = new CGFtexture(this, "textures/window2.jpg");
-    this.windowTexture3 = new CGFtexture(this, "textures/window3.jpg");
+    this.defaultWindow = 0;
 
-    this.windowText = 1;
+    this.windowTextureList = {
+      'Window Type 1': 0,
+      'Window Type 2': 1,
+      'Window Type 3': 2
+    };
+
+    this.windowText = [
+      new CGFtexture(this, "textures/window.jpg"),
+      new CGFtexture(this, "textures/window2.jpg"),
+      new CGFtexture(this, "textures/window3.jpg")
+    ];
 
     this.buildings = new MyBuildings(
       this,
@@ -93,7 +95,7 @@ export class MyScene extends CGFscene {
       this.buildingTopUp,
       this.buildingFrontTexture,
       this.buildingSideTexture,
-      this.windowTexture1
+      this.windowText[this.defaultWindow]
     );
 
     this.buildingWidth = 1;
@@ -122,25 +124,8 @@ export class MyScene extends CGFscene {
     })
   }
 
-  updateWindowTexture(index){
-
-    index = Math.round(index) - 1;
-
-    console.log(index);
-
-    switch(index){
-      case 0:
-        this.buildings.updateWindow(this.windowTexture1);
-      break;
-
-      case 1:
-        this.buildings.updateWindow(this.windowTexture2);
-      break;
-
-      case 2:
-        this.buildings.updateWindow(this.windowTexture3);
-      break;
-    }
+  updateWindowTexture(index) {
+    this.buildings.updateWindow(this.windowText[index]);
   }
 
   updateMovX(value) {
@@ -153,7 +138,7 @@ export class MyScene extends CGFscene {
     this.movZ = value;
   }
 
-  updateBuildingWidth(wid){
+  updateBuildingWidth(wid) {
     this.buildingWidth = wid;
   }
 
@@ -183,7 +168,7 @@ export class MyScene extends CGFscene {
 
   initCameras() {
     this.camera = new CGFcamera(
-      90.0,
+      1.0,
       0.9,
       1000,
       vec3.fromValues(-31, 56, -47),
@@ -272,15 +257,15 @@ export class MyScene extends CGFscene {
     this.setShininess(10.0);
   }
 
-  updateBuildingColor(color){
+  updateBuildingColor(color) {
     this.buildings.updateColor(color);
   }
 
-  updateFloorCount(count){
+  updateFloorCount(count) {
     this.buildings.updateFloorCount(count);
   }
 
-  updateFloorWindowCount(count){
+  updateFloorWindowCount(count) {
     this.buildings.updateFloorWindowCount(count);
   }
 
@@ -341,14 +326,6 @@ export class MyScene extends CGFscene {
     this.panorama.display();
     this.popMatrix();
 
-    // TODO: remove
-    this.pushMatrix();
-    /* this.multMatrix(getTranslationMatrix(84, this.movY, 37)); */
-    this.multMatrix(getTranslationMatrix(this.movX, this.movY, this.movZ));
-    this.multMatrix(getScalingMatrix(0.5, 20, 0.5))
-    this.altPlane.display();
-    this.popMatrix();
-
     if (this.camera.position[1] < 0.0) this.camera.position[1] = 0.0;
 
     if (this.displayTree) {
@@ -363,7 +340,7 @@ export class MyScene extends CGFscene {
     this.heli.display();
 
     this.pushMatrix();
-    this.multMatrix(getScalingMatrix(this.buildingWidth, 1, 1))
+    this.multMatrix(getScalingMatrix(this.buildingWidth, 1, this.buildingWidth))
     this.buildings.display();
     this.popMatrix();
 

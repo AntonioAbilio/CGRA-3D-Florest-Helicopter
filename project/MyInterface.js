@@ -46,23 +46,17 @@ export class MyInterface extends CGFinterface {
         f1.add(this.scene, 'forestLines', 4, 10).step(1).name("Num. of Lines").onChange(this.scene.updateForestLines.bind(this.scene));
         f1.add(this.scene, 'forestColumns', 4, 10).step(1).name("Num. of Cols").onChange(this.scene.updateForestColumns.bind(this.scene));
 
-        // TODO: remove
-        var f2 = this.gui.addFolder('Debug Settings');
-        f2.add(this.scene, 'movX', 0.0, 100.0).name("X_pos_tracer").onChange(this.scene.updateMovX.bind(this.scene));
-        f2.add(this.scene, 'movY', 0.0, 100.0).name("Y_pos_tracer").onChange(this.scene.updateMovY.bind(this.scene));
-        f2.add(this.scene, 'movZ', 0.0, 100.0).name("Z_pos_tracer").onChange(this.scene.updateMovZ.bind(this.scene));
+        var f2 = this.gui.addFolder('Realism');
+        f2.add(this.scene, 'raindropSize', 1.0, 10.0).name("Raindrop size");
+        f2.add(this.scene, 'raindropFreq', 1.0, 10.0).name("Raindrop freq.");
 
-        var f3 = this.gui.addFolder('Realism');
-        f3.add(this.scene, 'raindropSize', 1.0, 10.0).name("Raindrop size").onChange(this.scene.updateMovX.bind(this.scene));
-        f3.add(this.scene, 'raindropFreq', 1.0, 10.0).name("Raindrop freq.").onChange(this.scene.updateMovX.bind(this.scene));
+        var f3 = this.gui.addFolder('Buildings');
 
-        var f4 = this.gui.addFolder('Buildings');
-
-        f4.add(this.scene, 'buildingWidth', 0.0, 5.0).name("Building Width").onChange(this.scene.updateBuildingWidth.bind(this.scene));
-        f4.add(this.scene, 'floorCount', 1, 8).name("Floor Count").onChange(this.scene.updateFloorCount.bind(this.scene));
-        f4.add(this.scene, 'windowCount', 1, 8).name("Floor Window Count").onChange(this.scene.updateFloorWindowCount.bind(this.scene));
-        f4.add(this.scene, 'windowText', 1, 3).name("Window Texture").onChange(this.scene.updateWindowTexture.bind(this.scene));
-        f4.addColor(this.scene, 'buildingColor').onChange(this.scene.updateBuildingColor.bind(this.scene));
+        f3.add(this.scene, 'buildingWidth', 0.8, 2.0).name("Building Width").onChange(this.scene.updateBuildingWidth.bind(this.scene));
+        f3.add(this.scene, 'floorCount', 1, 8).step(1).name("Floor Count").onChange(this.scene.updateFloorCount.bind(this.scene));
+        f3.add(this.scene, 'windowCount', 2, 8).step(1).name("Floor Window Count").onChange(this.scene.updateFloorWindowCount.bind(this.scene));
+        f3.add(this.scene, 'defaultWindow', this.scene.windowTextureList).name("Window Texture").onChange(this.scene.updateWindowTexture.bind(this.scene));
+        f3.addColor(this.scene, 'buildingColor').onChange(this.scene.updateBuildingColor.bind(this.scene));
 
         // disable the processKeyboard function
         this.processKeyboard = function () { };

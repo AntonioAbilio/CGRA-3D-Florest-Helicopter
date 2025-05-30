@@ -11,6 +11,7 @@ export class MyHeliLight extends CGFobject {
         this.appearance.setShininess(10.0);
         this.appearance.loadTexture('textures/light_aluminium.jpg');
         this.appearance.setTextureWrap('REPEAT', 'REPEAT');
+        this.lightsAreOff = false;
         this.radius = 0.3;
 
         this.sphere = new MySphere(scene, 16, 16, 1, false);
@@ -22,6 +23,17 @@ export class MyHeliLight extends CGFobject {
             this.appearance.setDiffuse(intensity, intensity, intensity, 1);
             this.appearance.setSpecular(intensity, intensity, intensity, 1);
             this.appearance.setAmbient(intensity, intensity, intensity, 1);
+            this.appearance.setEmission(intensity, intensity, intensity, 1);
+            this.lightsAreOff = false;
+            return;
+        }
+
+        if (!this.lightsAreOff) {
+            this.appearance.setDiffuse(0, 0, 0, 1);
+            this.appearance.setSpecular(0, 0, 0, 1);
+            this.appearance.setAmbient(0, 0, 0, 1);
+            this.appearance.setEmission(0, 0, 0, 1);
+            this.lightsAreOff = true;
         }
     }
 

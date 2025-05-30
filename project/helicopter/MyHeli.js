@@ -342,8 +342,6 @@ export class MyHeli extends CGFobject {
 
         // User used the L key...
         if (this.readyToDescend) {
-            // TODO: Need to do more verifications (See 4.3.2)
-
             // If the user presses the L key on top of the lake then we will enter this and
             // execute the instructions for the helicopter to descend.
 
@@ -613,9 +611,6 @@ export class MyHeli extends CGFobject {
                 break;
         }
 
-        // TODO: remove
-        console.log(this.autoPilotState)
-
         this.velocity_vec3 = [0.0, this.velocity_vec3[1], 0.0];
         this.inclination = 0;
     }
@@ -634,7 +629,7 @@ export class MyHeli extends CGFobject {
 
                     const currentTime = performance.now();
 
-                    if (currentTime - this.lastTextureToggleTime >= 150) {
+                    if (currentTime - this.lastTextureToggleTime >= 200) {
                         this.scene.buildings.centerBuilding.toggleUpTexture();
                         this.lastTextureToggleTime = currentTime;
                     }
@@ -753,7 +748,7 @@ export class MyHeli extends CGFobject {
         this.ignoreInputs = true;
 
         // Start the movement of the helicopter.
-        this.velocity_vec3[1] += this.scene.baseAcceleration;
+        this.velocity_vec3[1] += this.scene.baseAcceleration * 0.5;
 
     }
 

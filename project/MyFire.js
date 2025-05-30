@@ -1,4 +1,4 @@
-import { CGFobject, CGFshader} from '../lib/CGF.js';
+import { CGFobject, CGFshader } from '../lib/CGF.js';
 
 export class MyFire extends CGFobject {
     constructor(scene, texture, scale = 2.0) {
@@ -10,7 +10,7 @@ export class MyFire extends CGFobject {
         this.shader = new CGFshader(scene.gl, "shaders/fire.vert", "shaders/fire.frag");
         this.shader.setUniformsValues({ uSampler: 0 });
 
-        this.fire_offset = Math.random() * 50;
+        this.fire_offset = Math.random() * 500;
     }
 
 
@@ -43,13 +43,24 @@ export class MyFire extends CGFobject {
         // Define all front-facing flame triangles
         const verts = [
             // Main flame (center)
-            [0.0, height, 0.0, -base, 0.0, 0.0, base, 0.0, 0.0],
+            [0.0, height, 0.0,
+                -base, 0.0, 0.0,
+                base, 0.0, 0.0],
+
             // Side flame 1 (left, leaning back)
-            [-0.2 * base, height * 1.2, -0.2 * this.scale, -base * 0.8, 0.0, -0.1 * this.scale, 0.0, 0.0, -0.2 * this.scale],
+            [-0.2 * base, height * 1.2, -0.1,
+            -base * 0.8, 0.0, -0.1,
+                0.0, 0.0, -0.1],
+
             // Side flame 2 (right, leaning back)
-            [0.2 * base, height * 1.1, -0.2 * this.scale, 0.0, 0.0, -0.2 * this.scale, base * 0.8, 0.0, -0.1 * this.scale],
+            [0.2 * base, height * 1.1, -0.1,
+                0.0, 0.0, -0.1,
+            base * 0.8, 0.0, -0.1],
+
             // Side flame 3 (forward)
-            [0.0, height * 1.15, 0.25 * this.scale, -0.4 * base, 0.0, 0.2 * this.scale, 0.4 * base, 0.0, 0.2 * this.scale]
+            [0.0, height * 1.15, 0.1,
+                -0.4 * base, 0.0, 0.1,
+                0.4 * base, 0.0, 0.1]
         ];
 
         let subdividedVerts = [];
@@ -94,7 +105,7 @@ export class MyFire extends CGFobject {
         if (this.texture) this.texture.bind(0);
 
         this.shader.setUniformsValues({
-            uTime: performance.now() / 1000.0, // time in seconds
+            uTime: (performance.now() + this.fire_offset) / 1000.0, // time in seconds
         });
 
         this.scene.setActiveShader(this.shader);
