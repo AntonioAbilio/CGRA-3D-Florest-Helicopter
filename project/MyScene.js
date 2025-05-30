@@ -179,7 +179,17 @@ export class MyScene extends CGFscene {
   checkKeys(deltaTime) {
     var text = "Keys pressed: ";
     var keysPressed = false;
-    if (this.gui.isKeyPressed("KeyW")) {
+
+    if (this.gui.isKeyPressed("KeyS")) {
+      text += " S ";
+      keysPressed = true;
+      this.heli.accelarate(-deltaTime);
+    }
+
+    // The boolean is only true if the user is pressing the S key because it's the only check that is above
+    // the W key. This is mimicking the normal behavior of a vehicle where if a user presses both the accelarator
+    // and the brake at the same time the brake has priority over the accelarator.
+    if (this.gui.isKeyPressed("KeyW") && !keysPressed) {
       text += " W ";
       keysPressed = true;
       this.heli.accelarate(deltaTime);
@@ -189,12 +199,6 @@ export class MyScene extends CGFscene {
       text += " A ";
       keysPressed = true;
       this.heli.turn(1);
-    }
-
-    if (this.gui.isKeyPressed("KeyS")) {
-      text += " S ";
-      keysPressed = true;
-      this.heli.accelarate(-deltaTime);
     }
 
     if (this.gui.isKeyPressed("KeyD")) {
@@ -330,7 +334,7 @@ export class MyScene extends CGFscene {
 
     if (this.displayTree) {
       this.pushMatrix();
-      this.multMatrix(getTranslationMatrix(30, 0, 30));
+      this.multMatrix(getTranslationMatrix(20, 0, 20));
       this.tree.display();
       this.popMatrix();
     }

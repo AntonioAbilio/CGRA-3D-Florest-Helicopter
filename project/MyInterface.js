@@ -58,6 +58,9 @@ export class MyInterface extends CGFinterface {
         f3.add(this.scene, 'defaultWindow', this.scene.windowTextureList).name("Window Texture").onChange(this.scene.updateWindowTexture.bind(this.scene));
         f3.addColor(this.scene, 'buildingColor').onChange(this.scene.updateBuildingColor.bind(this.scene));
 
+        // Helicopter max height
+        this.gui.add(this.scene.heli, 'helicopterMaxFlyHeigh', 3.0, 15.0).name('Max Fly Height').onChange(this.scene.heli.updateHelicopterMaxFlyHeight.bind(this.scene.heli));
+
         // disable the processKeyboard function
         this.processKeyboard = function () { };
 

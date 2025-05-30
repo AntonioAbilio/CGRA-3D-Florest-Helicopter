@@ -14,7 +14,7 @@ import { MyPyramid } from '../MyPyramid.js';
  * @param trunkRadius - number of divisions along the Y axis
 */
 export class MyTree extends CGFobject {
-    constructor(scene, treeSize, X_inclination, Z_inclination, trunkRadius, leavesRGB, fireTexture, displayFire) {
+    constructor(scene, treeSize, X_inclination, Z_inclination, trunkRadius, leavesRGB, fireTexture, displayFire, texturePath) {
         super(scene);
 
         if (treeSize < 2) {
@@ -32,11 +32,24 @@ export class MyTree extends CGFobject {
         this.trunk_radius = trunkRadius;
 
         // Leaves
+        this.texturePath = texturePath;
         this.leavesMaterial = new CGFappearance(scene);
-        this.leavesMaterial.setDiffuse((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
-        //this.leavesMaterial.setShininess((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
-        this.leavesMaterial.setAmbient((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
-        this.leaves = new MyPyramid(this.scene, leavesRGB, this.leaves_base_radius, 'textures/leaves.jpg');
+
+        if (this.texturePath) {
+            this.leavesMaterial.setAmbient(0.1, 0.1, 0.1, 1);
+            this.leavesMaterial.setDiffuse(0.9, 0.9, 0.9, 1);
+            this.leavesMaterial.setSpecular(0.1, 0.1, 0.1, 1);
+            this.leavesMaterial.setShininess(10.0);
+            this.leavesMaterial.loadTexture(texturePath);
+            this.leavesMaterial.setTextureWrap('REPEAT', 'REPEAT');
+        } else {
+            this.leavesMaterial.setDiffuse((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
+            this.leavesMaterial.setShininess((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
+            this.leavesMaterial.setAmbient((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
+        }
+
+
+        this.leaves = new MyPyramid(this.scene, leavesRGB, this.leaves_base_radius, this.leavesMaterial);
 
         // Trunk
         this.trunk = new MyTrunk(this.scene, 20, 20, this.trunk_radius, this.max_visible_size_for_trunk + 1);
@@ -71,7 +84,6 @@ export class MyTree extends CGFobject {
             this.scene.pushMatrix();
             this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * i), 0));
             this.scene.scale(1 * ((amount_of_leaves - i) / amount_of_leaves), 1.5, 1 * ((amount_of_leaves - i) / amount_of_leaves)); // Make it smaller
-            this.leavesMaterial.apply();
             this.leaves.display();
             this.scene.popMatrix();
 
@@ -113,17 +125,25 @@ export class MyTree extends CGFobject {
     }
 
     updateLeavesColors(hexColor) {
-        this.leavesMaterial.setDiffuse((hexColor & 0x0000ff) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, ((hexColor & 0xff0000) >>> 16) / 255, 0);
-        this.initBuffers();
-        this.initNormalVizBuffers();
+        if (!this.texturePath) {
+            this.leavesMaterial.setDiffuse((hexColor & 0x0000ff) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, ((hexColor & 0xff0000) >>> 16) / 255, 0);
+            this.leavesMaterial.setAmbient((hexColor & 0x0000ff) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, ((hexColor & 0xff0000) >>> 16) / 255, 0);
+            this.leavesMaterial.setSpecular((hexColor & 0x0000ff) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, ((hexColor & 0xff0000) >>> 16) / 255, 0);
+            this.initBuffers();
+            this.initNormalVizBuffers();
+        }
     }
 
     updateXInclination(X_Inc) {
-        this.X_inclination = X_Inc;
+        if (!this.texturePath) {
+            this.X_inclination = X_Inc;
+        }
     }
 
     updateZInclination(Z_Inc) {
-        this.Z_inclination = Z_Inc;
+        if (!this.texturePath) {
+            this.Z_inclination = Z_Inc;
+        }
     }
 
     /**

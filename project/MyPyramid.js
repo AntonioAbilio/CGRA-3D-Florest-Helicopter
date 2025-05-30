@@ -6,20 +6,21 @@ import { CGFobject, CGFappearance } from '../../lib/CGF.js';
  * @param slices - number of divisions around the Y axis
 */
 export class MyPyramid extends CGFobject {
-    constructor(scene, leavesRGB, radius, texturePath) {
+    constructor(scene, leavesRGB, radius, appearance) {
         super(scene);
         this.slices = 6;
         this.leavesRGB = leavesRGB;
         this.radius = radius;
 
+        this.leavesAppearance = appearance;
         // Texture for leaves.
-        this.leaves = new CGFappearance(this.scene);
+        /* this.leaves = new CGFappearance(this.scene);
         this.leaves.setAmbient(0.1, 0.1, 0.1, 1);
         this.leaves.setDiffuse(0.9, 0.9, 0.9, 1);
         this.leaves.setSpecular(0.1, 0.1, 0.1, 1);
         this.leaves.setShininess(10.0);
         this.leaves.loadTexture(texturePath);
-        this.leaves.setTextureWrap('REPEAT', 'REPEAT');
+        this.leaves.setTextureWrap('REPEAT', 'REPEAT'); */
 
         // Pyramid / Leaves Z Size
         this.z_size = 2;
@@ -124,8 +125,8 @@ export class MyPyramid extends CGFobject {
 
 
     display() {
-        if (this.leaves.texture) {
-            this.leaves.apply();
+        if (this.leavesAppearance) {
+            this.leavesAppearance.apply();
         }
         super.display();
     }

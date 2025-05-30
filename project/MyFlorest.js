@@ -65,7 +65,7 @@ export class MyFlorest extends CGFobject {
             for (let col = 0; col < this.num_columns; col++) {
 
                 // Store the tree and its position
-                this.trees.push({ tree: new MyTree(this.scene, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632, this.fireTexture, true), position: [x, z] });
+                this.trees.push({ tree: new MyTree(this.scene, (Math.random() + 0.2) * 10, -6 + (12 * Math.random()), -6 + (12 * Math.random()), 1, 0x184632, this.fireTexture, true, 'textures/leaves.jpg'), position: [x, z] });
 
                 x += spacing_x;
             }
