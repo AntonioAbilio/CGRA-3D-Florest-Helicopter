@@ -79,7 +79,12 @@ export class MyScene extends CGFscene {
 
     this.buildingSideTexture = new CGFtexture(this, "textures/buildingSide.png");
     this.buildingFrontTexture = new CGFtexture(this, "textures/buildingSideFront.png");
-    this.windowTexture = new CGFtexture(this, "textures/window.jpg");
+
+    this.windowTexture1 = new CGFtexture(this, "textures/window.jpg");
+    this.windowTexture2 = new CGFtexture(this, "textures/window2.jpg");
+    this.windowTexture3 = new CGFtexture(this, "textures/window3.jpg");
+
+    this.windowText = 1;
 
     this.buildings = new MyBuildings(
       this,
@@ -88,7 +93,7 @@ export class MyScene extends CGFscene {
       this.buildingTopUp,
       this.buildingFrontTexture,
       this.buildingSideTexture,
-      this.windowTexture
+      this.windowTexture1
     );
 
     this.buildingWidth = 1;
@@ -115,6 +120,27 @@ export class MyScene extends CGFscene {
       uSampler3: 2,
       timeFactor: 0
     })
+  }
+
+  updateWindowTexture(index){
+
+    index = Math.round(index) - 1;
+
+    console.log(index);
+
+    switch(index){
+      case 0:
+        this.buildings.updateWindow(this.windowTexture1);
+      break;
+
+      case 1:
+        this.buildings.updateWindow(this.windowTexture2);
+      break;
+
+      case 2:
+        this.buildings.updateWindow(this.windowTexture3);
+      break;
+    }
   }
 
   updateMovX(value) {

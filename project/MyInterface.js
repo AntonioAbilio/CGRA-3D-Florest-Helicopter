@@ -59,8 +59,9 @@ export class MyInterface extends CGFinterface {
         var f4 = this.gui.addFolder('Buildings');
 
         f4.add(this.scene, 'buildingWidth', 0.0, 5.0).name("Building Width").onChange(this.scene.updateBuildingWidth.bind(this.scene));
-        f4.add(this.scene, 'floorCount', 1, 8).name("Floor Count").onChange(this.scene.updateFloorCount.bind(this.scene));~
+        f4.add(this.scene, 'floorCount', 1, 8).name("Floor Count").onChange(this.scene.updateFloorCount.bind(this.scene));
         f4.add(this.scene, 'windowCount', 1, 8).name("Floor Window Count").onChange(this.scene.updateFloorWindowCount.bind(this.scene));
+        f4.add(this.scene, 'windowText', 1, 3).name("Window Texture").onChange(this.scene.updateWindowTexture.bind(this.scene));
         f4.addColor(this.scene, 'buildingColor').onChange(this.scene.updateBuildingColor.bind(this.scene));
 
         // disable the processKeyboard function
