@@ -79,7 +79,8 @@ export class MyBuilding extends CGFobject {
             uTex0: 0,
             uTex1: 1,
             uTex2: 2,
-            uTexSelector: 0
+            uTexSelector: 0,
+            uColor: [1.0, 1.0, 1.0, 1.0] // default white
         });
 
         this.topTexture = topTexture;
@@ -107,6 +108,8 @@ export class MyBuilding extends CGFobject {
             material.setSpecular(0.1, 0.1, 0.1, a);
             material.setShininess(10);
         }
+
+        this.topShader.setUniformsValues({ uColor: [r, g, b, a] });
     }
 
     initializeWindowProperties() {
