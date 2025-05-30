@@ -33,7 +33,7 @@ export class MyBuildings extends CGFobject {
             15,
             20,
             15,
-            floors,
+            3,
             true,
             topTextureDown,
             topTextureUp
@@ -101,13 +101,17 @@ export class MyBuildings extends CGFobject {
     }
 
     updateFloorWindowCount(count){
-        
+        this.leftBuilding.updateWindowsPerFloor(count);
+        this.rightBuilding.updateWindowsPerFloor(count);
     }
 
     updateFloorCount(count){
 
-        this.leftBuilding.floors = count;
-        this.rightBuilding.floors = count;
+        this.leftBuilding.floors = Math.floor(count);
+        this.rightBuilding.floors = Math.floor(count);
+
+        this.leftBuilding.initializeWindowProperties();
+        this.rightBuilding.initializeWindowProperties();
     }
 
 }

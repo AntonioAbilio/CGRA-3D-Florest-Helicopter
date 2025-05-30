@@ -29,6 +29,9 @@ export class MyBuilding extends CGFobject {
         this.height = height;
         this.depth = depth;
         this.floors = floors;
+
+        this.windowsPerFloor = 2;
+
         this.entrance = entrance;
         this.isCenterBuilding = (entrance === true);
         this.textureFiltering = this.scene.gl.NEAREST;
@@ -105,9 +108,10 @@ export class MyBuilding extends CGFobject {
     initializeWindowProperties() {
         // Calculate floor height
         this.floorHeight = (this.height / this.floors);
+        this.windowWidth = (this.width / this.windowsPerFloor);
         
         // Window dimensions - proportional to building size
-        this.windowWidth = this.width * 0.2;
+        this.windowWidth = this.windowWidth * 0.4;
         this.windowHeight = this.floorHeight * 0.6;
 
         // Window spacing from the edges
@@ -163,6 +167,8 @@ export class MyBuilding extends CGFobject {
         const leftQuarterX = -this.width / 4;
         const rightQuarterX = this.width / 4;
 
+        const windowGap = (this.width/2) / (Math.floor(this.windowsPerFloor) - 1);
+
         this.scene.pushMatrix();
 
         // Apply rotation if this is the back face
@@ -170,24 +176,24 @@ export class MyBuilding extends CGFobject {
             this.scene.rotate(rotation, 0, 1, 0);
         }
 
-        console.log(this.height);
-
         // Calculate center position for the first floor
-        const firstFloorY = 0;
+        const firstFloorY = this.height/2 - this.floorHeight/2 + (this.entrance ? this.floorHeight : 0);
         
         // Place windows on each floor
-        for (let floor = 0; floor < this.floors - this.entrance; floor++) {
+        for (let floor = 0; floor < this.floors; floor++) {
 
             if (floor == 0 && this.entrance) continue;
 
             // Calculate Y position for this floor
-            const floorY = firstFloorY + floor * this.floorHeight;
+            const floorY = firstFloorY - floor * this.floorHeight;
+            
+            for(let w = 0; w < this.windowsPerFloor; w++){
+                const floorX = leftQuarterX + w * windowGap;
 
-            // Left half of the building - left window
-            this.displayWindow(leftQuarterX, floorY, posZ);
+                this.displayWindow(floorX, floorY, posZ);
+            }
 
-            // Right half of the building - left window
-            this.displayWindow(rightQuarterX, floorY, posZ);
+
         }
 
         this.scene.popMatrix();
@@ -276,6 +282,11 @@ export class MyBuilding extends CGFobject {
         if (this.isCenterBuilding) {
             this.heliLights.forEach(light => light.display());
         }
+    }
+
+    updateWindowsPerFloor(count){
+        this.windowsPerFloor = Math.floor(count);
+        this.initializeWindowProperties()
     }
 
     changeTexFiltering(filter) {
