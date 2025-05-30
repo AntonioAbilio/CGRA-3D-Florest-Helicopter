@@ -26,7 +26,7 @@ export class MyHeli extends CGFobject {
         this.waterBottom = new MyCircle(this.scene);
 
         // Position and movement
-        this.helicopterMaxFlyHeigh = 3.0;
+        this.helicopterMaxFlyHeigh = 10.0;
         this.last_velocity_vec3 = [0, 0, 0];
         this.velocity_vec3 = velocity_vec3;
         this.posX = posX;
