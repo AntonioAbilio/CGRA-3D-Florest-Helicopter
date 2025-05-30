@@ -730,6 +730,7 @@ export class MyHeli extends CGFobject {
         this.velocity_vec3 = [0, 0, 0];
 
         // Warnings and animations
+        this.scene.buildings.centerBuilding.setTopTextureSelector(0);
         this.shouldFlashLights = false;
         this.bucketOpen = false;
         this.ignoreInputs = false;

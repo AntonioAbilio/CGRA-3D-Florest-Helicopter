@@ -92,7 +92,7 @@ export class MyTree extends CGFobject {
 
         if (this.displayFire) {
             this.scene.pushMatrix();
-            this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * amount_of_leaves) * this.fire_pos, 0));
+            this.scene.multMatrix(getTranslationMatrix(0, start_z_for_leaves + (overlap_per_leaf * amount_of_leaves) * this.fire_pos + (Math.sin(performance.now() / 300) * 0.8 * Math.cos(performance.now() / 300) * 0.3), 0));
             this.scene.multMatrix(this.yRotationMatrix);
             this.fire.display();
             this.scene.popMatrix();
