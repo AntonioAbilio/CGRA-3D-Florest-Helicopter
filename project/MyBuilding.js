@@ -87,6 +87,10 @@ export class MyBuilding extends CGFobject {
         this.topTextureUp = topTextureUp;
     }
 
+    setWindowTexture(texture){
+        this.window.material.setTexture(texture);
+    }
+
 
     setBuildingColor(hexColor) {
         // Extract RGB components from hexColor (0xRRGGBB)

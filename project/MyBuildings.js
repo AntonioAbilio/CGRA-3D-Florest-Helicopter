@@ -114,4 +114,10 @@ export class MyBuildings extends CGFobject {
         this.rightBuilding.initializeWindowProperties();
     }
 
+    updateWindow(text){
+        this.leftBuilding.setWindowTexture(text);
+        this.rightBuilding.setWindowTexture(text);
+        this.centerBuilding.setWindowTexture(text);
+    }
+
 }
