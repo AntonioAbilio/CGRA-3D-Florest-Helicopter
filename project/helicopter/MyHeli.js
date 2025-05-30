@@ -43,6 +43,7 @@ export class MyHeli extends CGFobject {
         this.waterDrops = [];
 
         // Helicopter's Functionality
+        this.shouldFlashLights = false;
         this.isFlying = false;
         this.ignoreInputs = false;
         this.readyToDescend = false;
@@ -620,6 +621,7 @@ export class MyHeli extends CGFobject {
     }
 
     updateAnimations(delta) {
+        this.shouldFlashLights = false;
         if (this.posY > 0.0 || this.isFlying) {
             this.updateHelices(delta);
 
@@ -636,9 +638,11 @@ export class MyHeli extends CGFobject {
                         this.scene.buildings.centerBuilding.toggleUpTexture();
                         this.lastTextureToggleTime = currentTime;
                     }
+                    this.shouldFlashLights = true;
                 } else {
                     this.scene.buildings.centerBuilding.setTopTextureSelector(0);
                 }
+
             }
         }
 
@@ -657,6 +661,7 @@ export class MyHeli extends CGFobject {
             } else {
                 this.scene.buildings.centerBuilding.setTopTextureSelector(0);
             }
+            this.shouldFlashLights = true
         }
     }
 
@@ -729,6 +734,7 @@ export class MyHeli extends CGFobject {
         this.waterDrops = [];
         this.readyToAscend = false;
         this.firstTimeHere = true;
+        this.shouldFlashLights = false;
         this.autoPilotState = -1;
     }
 

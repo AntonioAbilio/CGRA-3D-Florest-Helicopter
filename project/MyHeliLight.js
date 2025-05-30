@@ -17,10 +17,12 @@ export class MyHeliLight extends CGFobject {
     }
 
     update(t) {
-        const intensity = 0.1 + 1.9 * Math.sin(t / 300);
-        this.appearance.setDiffuse(intensity, intensity, intensity, 1);
-        this.appearance.setSpecular(intensity, intensity, intensity, 1);
-        this.appearance.setAmbient(intensity, intensity, intensity, 1);
+        if (this.scene.heli.shouldFlashLights) {
+            const intensity = 0.1 + 1.9 * Math.sin(t / 300);
+            this.appearance.setDiffuse(intensity, intensity, intensity, 1);
+            this.appearance.setSpecular(intensity, intensity, intensity, 1);
+            this.appearance.setAmbient(intensity, intensity, intensity, 1);
+        }
     }
 
     display() {
