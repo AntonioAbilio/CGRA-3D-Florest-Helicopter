@@ -50,4 +50,12 @@ top of the trees. In our project we decided that the water supply is infinite wh
 ![](screenshots/project-t4g8-6.png)
 
 
+## project-t4g8-7
+
+In the picture the flames and the animation can be seen. Since it is not possible to show the animation in the image we provide two destinct images of the same flame to compare.
+
+![](screenshots/project-t4g8-7.png)
+
+![](screenshots/extras/flame-extra.png)
+
 
