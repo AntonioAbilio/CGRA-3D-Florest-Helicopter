@@ -1,17 +1,22 @@
-import { CGFobject, CGFappearance } from '../../lib/CGF.js';
+import { CGFobject, CGFappearance } from '../../../lib/CGF.js';
 
-import { getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getYRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
+import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix, getZRotationMatrix } from '../../utils/utils.js';
 import { MyTrunk } from './MyTrunk.js';
 import { MyFire } from '../MyFire.js';
-import { MyPyramid } from '../MyPyramid.js';
+import { MyPyramid } from '../../primitives/MyPyramid.js';
 
 /**
 * MyTree
 * @constructor
- * @param treeSize - Reference to MyScene object
- * @param X_inclination - number of divisions around the Y axis
- * @param Z_inclination - number of divisions along the Y axis
- * @param trunkRadius - number of divisions along the Y axis
+* @param scene - Reference to MyScene object.
+* @param treeSize - Overall size of the tree.
+* @param X_inclination - Inclination angle around X axis.
+* @param Z_inclination - Inclination angle around Z axis.
+* @param trunkRadius - Radius of the tree trunk.
+* @param leavesRGB - Hexadecimal RGB color value for leaves.
+* @param fireTexture - Path to fire texture.
+* @param displayFire - Whether to display fire on the tree.
+* @param texturePath - Path to leaves texture.
 */
 export class MyTree extends CGFobject {
     constructor(scene, treeSize, X_inclination, Z_inclination, trunkRadius, leavesRGB, fireTexture, displayFire, texturePath) {

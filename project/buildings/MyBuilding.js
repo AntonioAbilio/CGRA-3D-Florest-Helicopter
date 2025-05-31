@@ -1,8 +1,6 @@
-import { CGFobject, CGFappearance } from '../lib/CGF.js';
-import { CGFshader } from '../lib/CGF.js';
-import { MyQuad } from './MyQuad.js';
+import { CGFobject, CGFappearance, CGFshader } from '../../lib/CGF.js';
+import { MyQuad } from '../primitives/MyQuad.js';
 import { MyWindow } from './MyWindow.js';
-import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
 import { MyHeliLight } from "./MyHeliLight.js";
 
 /**
@@ -12,11 +10,15 @@ import { MyHeliLight } from "./MyHeliLight.js";
  * @param topTexture - Texture for the top face
  * @param frontTexture - Texture for the front face
  * @param sideTexture - Texture for the side faces
- * @param windowTexture - Texture for windows (new parameter)
- * @param floors - Number of floors (new parameter)
+ * @param windowTexture - Texture for windows
+ * @param floors - Number of floors
  * @param width - Width of the building (defaults to 10)
  * @param height - Height of the building (defaults to 20)
  * @param depth - Depth of the building (defaults to 10)
+ * @param floors - Number of floors (will be used to determine the number of windows to use to create the illusion of floors) (defaults to 4)
+ * @param entrance - Determines whether to display the main entrance and the "BOMBEIROS" sign.
+ * @param topTextureDown - Texture that has the Down wording.
+ * @param topTextureUp - Texture that has the Up wording.
  */
 export class MyBuilding extends CGFobject {
     constructor(scene, topTexture, frontTexture, sideTexture, windowTexture, width = 10, height = 10, depth = 10, floors = 4, entrance = false, topTextureDown = null, topTextureUp = null) {
@@ -88,7 +90,7 @@ export class MyBuilding extends CGFobject {
         this.topTextureUp = topTextureUp;
     }
 
-    setWindowTexture(texture){
+    setWindowTexture(texture) {
         this.window.material.setTexture(texture);
     }
 
@@ -116,7 +118,7 @@ export class MyBuilding extends CGFobject {
         // Calculate floor height
         this.floorHeight = (this.height / this.floors);
         this.windowWidth = (this.width / this.windowsPerFloor);
-        
+
         // Window dimensions - proportional to building size
         this.windowWidth = this.windowWidth * 0.4;
         this.windowHeight = this.floorHeight * 0.6;
@@ -174,7 +176,7 @@ export class MyBuilding extends CGFobject {
         const leftQuarterX = -this.width / 4;
         const rightQuarterX = this.width / 4;
 
-        const windowGap = (this.width/2) / (Math.floor(this.windowsPerFloor) - 1);
+        const windowGap = (this.width / 2) / (Math.floor(this.windowsPerFloor) - 1);
 
         this.scene.pushMatrix();
 
@@ -184,8 +186,8 @@ export class MyBuilding extends CGFobject {
         }
 
         // Calculate center position for the first floor
-        const firstFloorY = this.height/2 - this.floorHeight/2 + (this.entrance ? this.floorHeight : 0);
-        
+        const firstFloorY = this.height / 2 - this.floorHeight / 2 + (this.entrance ? this.floorHeight : 0);
+
         // Place windows on each floor
         for (let floor = 0; floor < this.floors; floor++) {
 
@@ -193,8 +195,8 @@ export class MyBuilding extends CGFobject {
 
             // Calculate Y position for this floor
             const floorY = firstFloorY - floor * this.floorHeight;
-            
-            for(let w = 0; w < this.windowsPerFloor; w++){
+
+            for (let w = 0; w < this.windowsPerFloor; w++) {
                 const floorX = leftQuarterX + w * windowGap;
 
                 this.displayWindow(floorX, floorY, posZ);
@@ -209,7 +211,7 @@ export class MyBuilding extends CGFobject {
     display() {
         if (this.topTextureDown != null) {
             this.scene.pushMatrix();
-            this.scene.translate(0, this.height/2, 0);
+            this.scene.translate(0, this.height / 2, 0);
             this.scene.rotate(-Math.PI / 2, 1, 0, 0);
             this.scene.scale(this.width, this.depth, 1);
 
@@ -232,7 +234,7 @@ export class MyBuilding extends CGFobject {
             this.scene.popMatrix();
         } else {
             this.scene.pushMatrix();
-            this.scene.translate(0, this.height/2, 0);
+            this.scene.translate(0, this.height / 2, 0);
             this.scene.rotate(-Math.PI / 2, 1, 0, 0);
             this.scene.scale(this.width, this.depth, 1);
             this.topMaterial.apply();
@@ -291,7 +293,7 @@ export class MyBuilding extends CGFobject {
         }
     }
 
-    updateWindowsPerFloor(count){
+    updateWindowsPerFloor(count) {
         this.windowsPerFloor = Math.floor(count);
         this.initializeWindowProperties()
     }

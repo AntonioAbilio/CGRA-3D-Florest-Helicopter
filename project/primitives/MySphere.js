@@ -2,10 +2,11 @@ import { CGFobject } from '../../lib/CGF.js';
 /**
  * MySphere
  * @constructor
- * @param scene - Reference to MyScene object
- * @param slices - Number of slices around the sphere
- * @param stacks - Number of stacks of the sphere
- * @param radius - Radius of the sphere (default: 1)
+ * @param scene - Reference to MyScene object.
+ * @param slices - Number of slices around the sphere.
+ * @param stacks - Number of stacks of the sphere.
+ * @param radius - Radius of the sphere.
+ * @param inside - Whether the sphere is inside out or not.
  */
 export class MySphere extends CGFobject {
     constructor(scene, slices, stacks, radius = 1, inside = true) {
@@ -57,13 +58,12 @@ export class MySphere extends CGFobject {
                 let first = (latNumber * (this.slices + 1)) + longNumber;
                 let second = first + this.slices + 1;
 
-                if(this.inside){
+                if (this.inside) {
 
                     this.indices.push(first, second, first + 1);
                     this.indices.push(second, second + 1, first + 1);
                 }
-                else
-                {
+                else {
                     this.indices.push(first, first + 1, second);
                     this.indices.push(second, first + 1, second + 1);
                 }

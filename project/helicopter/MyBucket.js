@@ -1,9 +1,9 @@
 import { CGFobject } from '../../lib/CGF.js';
-import { MyCircle } from './MyCircle.js';
+
 /**
- * MYBucket
+ * MyBucket
  * @constructor
- * @param scene - Reference to MyScene object
+ * @param scene - Reference to MyScene object.
  */
 export class MyBucket extends CGFobject {
     constructor(scene) {

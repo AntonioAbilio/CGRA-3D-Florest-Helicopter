@@ -1,15 +1,20 @@
 import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 import { MyHeliPrimitive } from './MyHeliPrimitive.js';
 import { getRad, getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getYRotationMatrix, getZRotationMatrix } from '../utils/utils.js';
-import { Cube } from './Cube.js'
-import { MyBucket } from '../MyBucket.js';
-import { MyCircle } from '../MyCircle.js';
-import { MyPyramid } from '../MyPyramid.js';
+import { Cube } from '../primitives/Cube.js'
+import { MyBucket } from './MyBucket.js';
+import { MyCircle } from '../primitives/MyCircle.js';
+import { MyPyramid } from '../primitives/MyPyramid.js';
 
 /**
  * MyHeli
  * @constructor
- * @param scene - Reference to MyScene object
+ * @param scene - Reference to MyScene object.
+ * @param posX - Initial X position of the helicopter.
+ * @param posY - Initial Y position of the helicopter.
+ * @param posZ - Initial Z position of the helicopter.
+ * @param orientation - Initial orientation angle in degrees.
+ * @param velocity_vec3 - Initial velocity vector as [x,y,z].
  */
 export class MyHeli extends CGFobject {
     constructor(scene, posX, posY, posZ, orientation = 0, velocity_vec3 = [0, 0, 0]) {

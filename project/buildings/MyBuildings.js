@@ -1,28 +1,22 @@
-import { CGFobject, CGFappearance } from '../lib/CGF.js';
-import { CGFshader} from '../lib/CGF.js';
-import { MyQuad } from './MyQuad.js';
-import { MyWindow } from './MyWindow.js';
-import { getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
-import { MyHeliLight } from "./MyHeliLight.js";
+import { CGFobject } from '../../lib/CGF.js';
 import { MyBuilding } from './MyBuilding.js';
 
 /**
- * MyBuilding
+ * MyBuildings
  * @constructor
- * @param scene - Reference to MyScene object
- * @param topTexture - Texture for the top face
- * @param frontTexture - Texture for the front face
- * @param sideTexture - Texture for the side faces
- * @param windowTexture - Texture for windows (new parameter)
- * @param floors - Number of floors (new parameter)
- * @param width - Width of the building (defaults to 10)
- * @param height - Height of the building (defaults to 20)
- * @param depth - Depth of the building (defaults to 10)
+ * @param scene - Reference to MyScene object.
+ * @param topTexture - Texture for the top face.
+ * @param topTextureDown - Texture that has the Down wording.
+ * @param topTextureUp -  Texture that has the Up wording.
+ * @param frontTexture - Texture for the front face.
+ * @param sideTexture - Texture for the side faces.
+ * @param windowTexture - Texture for windows.
+ * @param floors - Number of floors.
  */
 export class MyBuildings extends CGFobject {
     constructor(scene, topTexture, topTextureDown, topTextureUp, frontTexture, sideTexture, windowTexture, floors = 8) {
         super(scene);
-        
+
         // Create three buildings with different sizes and number of floors
         this.centerBuilding = new MyBuilding(
             scene,
@@ -38,7 +32,7 @@ export class MyBuildings extends CGFobject {
             topTextureDown,
             topTextureUp
         );
-    
+
         this.leftBuilding = new MyBuilding(
             scene,
             sideTexture,
@@ -50,7 +44,7 @@ export class MyBuildings extends CGFobject {
             10,
             floors - 1
         );
-    
+
         this.rightBuilding = new MyBuilding(
             scene,
             sideTexture,
@@ -64,10 +58,10 @@ export class MyBuildings extends CGFobject {
         );
     }
 
-    update(t){
+    update(t) {
         this.centerBuilding.update(t);
     }
-    
+
     display() {
 
         // Initialize buffers for all buildings
@@ -94,18 +88,18 @@ export class MyBuildings extends CGFobject {
         this.scene.popMatrix();
     }
 
-    updateColor(color){
+    updateColor(color) {
         this.leftBuilding.setBuildingColor(color)
         this.centerBuilding.setBuildingColor(color)
         this.rightBuilding.setBuildingColor(color)
     }
 
-    updateFloorWindowCount(count){
+    updateFloorWindowCount(count) {
         this.leftBuilding.updateWindowsPerFloor(count);
         this.rightBuilding.updateWindowsPerFloor(count);
     }
 
-    updateFloorCount(count){
+    updateFloorCount(count) {
 
         this.leftBuilding.floors = Math.floor(count);
         this.rightBuilding.floors = Math.floor(count);
@@ -114,7 +108,7 @@ export class MyBuildings extends CGFobject {
         this.rightBuilding.initializeWindowProperties();
     }
 
-    updateWindow(text){
+    updateWindow(text) {
         this.leftBuilding.setWindowTexture(text);
         this.rightBuilding.setWindowTexture(text);
         this.centerBuilding.setWindowTexture(text);

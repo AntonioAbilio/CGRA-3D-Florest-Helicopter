@@ -1,6 +1,6 @@
 // MyHeliLight.js
-import { CGFobject, CGFappearance } from "../lib/CGF.js";
-import { MySphere } from "./MySphere.js";
+import { CGFobject, CGFappearance } from "../../lib/CGF.js";
+import { MySphere } from "../primitives/MySphere.js";
 
 export class MyHeliLight extends CGFobject {
     constructor(scene, x, y, z) {

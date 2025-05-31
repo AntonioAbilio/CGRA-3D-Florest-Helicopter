@@ -1,15 +1,11 @@
 import { CGFscene, CGFappearance, CGFcamera, CGFaxis, CGFtexture, CGFshader } from "../lib/CGF.js";
-import { MyPlane } from "./MyPlane.js";
-import { getScalingMatrix, getTranslationMatrix, getXRotationMatrix, getYRotationMatrix } from './utils/utils.js';
-import { MyBuilding } from './MyBuilding.js';
-import { MyPanorama } from "./MyPanorama.js";
-import { MyTree } from "./tree/MyTree.js";
-import { MyFlorest } from "./MyFlorest.js";
+import { MyPlane } from "./primitives/MyPlane.js";
+import { getScalingMatrix, getTranslationMatrix } from './utils/utils.js';
+import { MyPanorama } from "./primitives/MyPanorama.js";
+import { MyTree } from "./forest/tree/MyTree.js";
+import { MyFlorest } from "./forest/MyFlorest.js";
 import { MyHeli } from "./helicopter/MyHeli.js";
-import { MyBuildings } from "./MyBuildings.js";
-
-import { MyFire } from "./MyFire.js";
-import { MyHeliLight } from "./MyHeliLight.js";
+import { MyBuildings } from "./buildings/MyBuildings.js";
 
 /**
  * MyScene

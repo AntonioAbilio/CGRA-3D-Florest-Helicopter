@@ -1,8 +1,12 @@
-import { CGFobject, CGFappearance } from '../../lib/CGF.js';
+import { CGFobject, CGFappearance } from '../../../lib/CGF.js';
 /**
  * MyTrunk
  * @constructor
- * @param scene - Reference to MyScene object
+ * @param scene - Reference to MyScene object.
+ * @param slices - Number of divisions around the trunk circumference.
+ * @param stacks - Number of divisions along the trunk height.
+ * @param trunk_radius - Radius of the tree trunk.
+ * @param max_size_for_trunk - Maximum height of the tree trunk.
  */
 export class MyTrunk extends CGFobject {
     constructor(scene, slices, stacks, trunk_radius, max_size_for_trunk) {

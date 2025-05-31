@@ -1,13 +1,14 @@
-import { CGFobject, CGFappearance } from '../../lib/CGF.js';
+import { CGFobject } from '../../lib/CGF.js';
 import { MyTree } from './tree/MyTree.js';
-import { getTranslationMatrix } from './utils/utils.js';
+import { getTranslationMatrix } from '../utils/utils.js';
 
 /**
 * MyFlorest
 * @constructor
- * @param scene - Reference to MyScene object
- * @param num_lines - number of lines
- * @param num_columns - number of columns
+ * @param scene - Reference to MyScene object.
+ * @param num_lines - number of lines.
+ * @param num_columns - number of columns.
+ * @param fireTexture - The texture for the fire.
 */
 export class MyFlorest extends CGFobject {
     constructor(scene, num_lines, num_columns, fireTexture) {

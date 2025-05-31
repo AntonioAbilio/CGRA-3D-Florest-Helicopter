@@ -1,4 +1,4 @@
-import { CGFobject, CGFshader } from '../lib/CGF.js';
+import { CGFobject, CGFshader } from '../../lib/CGF.js';
 
 export class MyFire extends CGFobject {
     constructor(scene, texture, scale = 2.0) {

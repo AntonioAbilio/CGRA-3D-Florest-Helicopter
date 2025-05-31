@@ -1,9 +1,11 @@
-import { CGFobject, CGFappearance } from '../../lib/CGF.js';
+import { CGFobject } from '../../lib/CGF.js';
 /**
-* MyLeaves
+* MyPyramid
 * @constructor
- * @param scene - Reference to MyScene object
- * @param slices - number of divisions around the Y axis
+* @param scene - Reference to MyScene object.
+* @param leavesRGB - Hexadecimal RGB color value for leaves.
+* @param radius - Base radius of the pyramid.
+* @param appearance - Material/appearance to apply to the pyramid.
 */
 export class MyPyramid extends CGFobject {
     constructor(scene, leavesRGB, radius, appearance) {
@@ -11,16 +13,7 @@ export class MyPyramid extends CGFobject {
         this.slices = 6;
         this.leavesRGB = leavesRGB;
         this.radius = radius;
-
         this.leavesAppearance = appearance;
-        // Texture for leaves.
-        /* this.leaves = new CGFappearance(this.scene);
-        this.leaves.setAmbient(0.1, 0.1, 0.1, 1);
-        this.leaves.setDiffuse(0.9, 0.9, 0.9, 1);
-        this.leaves.setSpecular(0.1, 0.1, 0.1, 1);
-        this.leaves.setShininess(10.0);
-        this.leaves.loadTexture(texturePath);
-        this.leaves.setTextureWrap('REPEAT', 'REPEAT'); */
 
         // Pyramid / Leaves Z Size
         this.z_size = 2;

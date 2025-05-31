@@ -1,4 +1,4 @@
-import { CGFobject, CGFtexture } from "../lib/CGF.js";
+import { CGFobject, CGFtexture } from "../../lib/CGF.js";
 /**
 * MyPlane
 * @constructor
