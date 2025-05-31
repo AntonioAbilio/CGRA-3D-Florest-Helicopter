@@ -41,3 +41,13 @@ of a metal looking texture and the window is made with a texture that resembles 
 This photo shows the helicopter while its in the air. In the corner we can also see the parameters that can alter its behavior (The "Speed Factor" which changes how fast the helicopter moves and also the "Max Fly Height" which defines what is the cruizing altitude for the helicopter).
 
 ![](screenshots/project-t4g8-5.png)
+
+## project-t4g8-6
+
+In the photo we can see the forest that and the fire that is in the trees. We can also see the lake from where the helicopter took some water and is now dumping it on
+top of the trees. In our project we decided that the water supply is infinite while the fire is ongoing and as soon as the fire is out the water runs out. In the picture we also show the two extra parameters that we added... Since we decided that to extinguish the fire in the forest the water would have to pass through every tree that is on fire we thought that it would be a necessity having two parameters that not only define the size of the water drop and also the frequency of a drop of water falling from the bucket. Both of these parameters facilitate demonstration.
+
+![](screenshots/project-t4g8-6.png)
+
+
+
