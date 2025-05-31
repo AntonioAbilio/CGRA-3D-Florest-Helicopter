@@ -431,8 +431,6 @@ export class MyHeli extends CGFobject {
                 if (this.posZ < -posTolerance || Math.floor(this.posZ) == 0.0) {
                     this.autoPilotState++;
                     break;
-                } else {
-                    console.log("herrre")
                 }
 
                 // Check if we need to rotate to 180 degrees
@@ -799,7 +797,6 @@ export class MyHeli extends CGFobject {
                 const currentTime = performance.now();
 
                 if (currentTime - this.lastTimeWaterDropCreated >= (1 / this.scene.raindropFreq) * 1000) {
-                    console.log("Water drop created")
                     this.waterDrops.push({
                         waterDrop: new MyPyramid(this.scene, 0xffffff, this.scene.raindropSize, this.waterTexture), currentPosition: [this.posX, this.posY + (this.scene.buildings.centerBuilding.height - this.helicopterMaxFlyHeigh), this.posZ]
                     });

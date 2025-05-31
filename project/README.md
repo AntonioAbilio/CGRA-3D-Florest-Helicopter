@@ -22,3 +22,9 @@ These parameters get updated in real time.
 
 ![](screenshots/project-t4g8-2.png)
 
+## project-t4g8-3
+
+The image below shows our trees and also the tree that can be parameterized (the blue tree in the back). In the shot it can also be seen the controls that allow
+for the change of the tree's values.
+
+![](screenshots/project-t4g8-3.png)

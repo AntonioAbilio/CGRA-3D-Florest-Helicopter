@@ -146,7 +146,6 @@ export class MyPyramid extends CGFobject {
      * @param {integer} newRadius - changes the radius of the base of the leaves
      */
     updateRadius(newRadius) {
-        console.log(newRadius)
         this.radius = newRadius;
         this.initBuffers();
         this.initNormalVizBuffers();

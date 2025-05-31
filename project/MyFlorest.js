@@ -100,7 +100,6 @@ export class MyFlorest extends CGFobject {
                 const treeRef = this.trees.at(idx);
 
                 isFireExtinguished = isFireExtinguished && (!treeRef.tree.isOnFire());
-                console.log(`${isFireExtinguished} -> ${(!treeRef.tree.isOnFire())}`)
 
                 const dx = treeRef.position[0] - waterDropPosition[0];
                 const dz = treeRef.position[1] - waterDropPosition[2];

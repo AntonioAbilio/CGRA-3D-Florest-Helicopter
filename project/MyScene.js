@@ -176,11 +176,9 @@ export class MyScene extends CGFscene {
   }
 
   checkKeys(deltaTime) {
-    var text = "Keys pressed: ";
     var keysPressed = false;
 
     if (this.gui.isKeyPressed("KeyS")) {
-      text += " S ";
       keysPressed = true;
       this.heli.accelarate(-deltaTime);
     }
@@ -189,49 +187,40 @@ export class MyScene extends CGFscene {
     // the W key. This is mimicking the normal behavior of a vehicle where if a user presses both the accelarator
     // and the brake at the same time the brake has priority over the accelarator.
     if (this.gui.isKeyPressed("KeyW") && !keysPressed) {
-      text += " W ";
       keysPressed = true;
       this.heli.accelarate(deltaTime);
     }
 
     if (this.gui.isKeyPressed("KeyA")) {
-      text += " A ";
       keysPressed = true;
       this.heli.turn(1);
     }
 
     if (this.gui.isKeyPressed("KeyD")) {
-      text += " D ";
       keysPressed = true;
       this.heli.turn(-1);
     }
 
     if (this.gui.isKeyPressed("KeyR")) {
-      text += " R ";
       keysPressed = true;
       this.heli.reset();
     }
 
     if (this.gui.isKeyPressed("KeyP")) {
-      text += " P ";
       keysPressed = true;
       this.heli.fly();
     }
 
     if (this.gui.isKeyPressed("KeyL")) {
-      text += " L ";
       keysPressed = true;
       this.heli.stopFlying();
     }
 
     if (this.gui.isKeyPressed("KeyO")) {
-      text += " O ";
       keysPressed = true;
       this.heli.openBucket();
     }
 
-
-    if (keysPressed) console.log(text);
   }
 
   update(time) {

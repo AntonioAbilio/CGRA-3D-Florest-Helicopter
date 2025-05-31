@@ -43,9 +43,9 @@ export class MyTree extends CGFobject {
             this.leavesMaterial.loadTexture(texturePath);
             this.leavesMaterial.setTextureWrap('REPEAT', 'REPEAT');
         } else {
-            this.leavesMaterial.setDiffuse((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
-            this.leavesMaterial.setShininess((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
-            this.leavesMaterial.setAmbient((leavesRGB & 0x0000ff) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, ((leavesRGB & 0xff0000) >>> 16) / 255, 0);
+            this.leavesMaterial.setDiffuse(((leavesRGB & 0xff0000) >>> 16) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, (leavesRGB & 0x0000ff) / 255, 0);
+            this.leavesMaterial.setAmbient(((leavesRGB & 0xff0000) >>> 16) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, (leavesRGB & 0x0000ff) / 255, 0);
+            this.leavesMaterial.setSpecular(((leavesRGB & 0xff0000) >>> 16) / 255, ((leavesRGB & 0x00ff00) >>> 8) / 255, (leavesRGB & 0x0000ff) / 255, 0);
         }
 
 
@@ -126,9 +126,9 @@ export class MyTree extends CGFobject {
 
     updateLeavesColors(hexColor) {
         if (!this.texturePath) {
-            this.leavesMaterial.setDiffuse((hexColor & 0x0000ff) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, ((hexColor & 0xff0000) >>> 16) / 255, 0);
-            this.leavesMaterial.setAmbient((hexColor & 0x0000ff) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, ((hexColor & 0xff0000) >>> 16) / 255, 0);
-            this.leavesMaterial.setSpecular((hexColor & 0x0000ff) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, ((hexColor & 0xff0000) >>> 16) / 255, 0);
+            this.leavesMaterial.setDiffuse(((hexColor & 0xff0000) >>> 16) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, (hexColor & 0x0000ff) / 255, 0);
+            this.leavesMaterial.setAmbient(((hexColor & 0xff0000) >>> 16) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, (hexColor & 0x0000ff) / 255, 0);
+            this.leavesMaterial.setSpecular(((hexColor & 0xff0000) >>> 16) / 255, ((hexColor & 0x00ff00) >>> 8) / 255, (hexColor & 0x0000ff) / 255, 0);
             this.initBuffers();
             this.initNormalVizBuffers();
         }

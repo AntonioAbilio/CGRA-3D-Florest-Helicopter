@@ -106,7 +106,6 @@ export class MyUnitCubeQuad extends CGFobject {
         this.scene.multMatrix(rotation);
         this.bottomTexture.bind();
         this.scene.gl.texParameteri(this.scene.gl.TEXTURE_2D, this.scene.gl.TEXTURE_MAG_FILTER, this.textureFiltering);
-        console.log(this.textureFiltering)
         this.quad.display();
         this.scene.popMatrix();
 
