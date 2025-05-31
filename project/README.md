@@ -35,3 +35,9 @@ Our helicopter is shown below and in it we can see the textures that were used a
 of a metal looking texture and the window is made with a texture that resembles the glass used in a "real life" helicopter.
 
 ![](screenshots/project-t4g8-4.png)
+
+## project-t4g8-5
+
+This photo shows the helicopter while its in the air. In the corner we can also see the parameters that can alter its behavior (The "Speed Factor" which changes how fast the helicopter moves and also the "Max Fly Height" which defines what is the cruizing altitude for the helicopter).
+
+![](screenshots/project-t4g8-5.png)
