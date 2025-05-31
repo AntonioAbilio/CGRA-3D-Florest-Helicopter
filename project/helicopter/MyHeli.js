@@ -826,7 +826,7 @@ export class MyHeli extends CGFobject {
 
     openBucket() {
 
-        if (true/* this.waterBucketState == 1 && this.scene.florest.checkIfHelicopterInside([this.posX, this.posY, this.posZ]) */) {
+        if (this.waterBucketState == 1 && this.scene.florest.checkIfHelicopterInside([this.posX, this.posY, this.posZ])) {
             this.waterBucketState = 2; // Let's let the water fall out.
             this.bucketOpen = true;
         }
