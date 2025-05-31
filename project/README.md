@@ -58,4 +58,11 @@ In the picture the flames and the animation can be seen. Since it is not possibl
 
 ![](screenshots/extras/flame-extra.png)
 
+## project-t4g8-8
 
+For the aditional part we decided to choose the third (option C). A lake that feels more "real" by using shaders to add waves.
+Again, since pictures cannot show the movement of the lake and the waves we provide two photos that show variation of the lake from the same position.
+
+![](screenshots/project-t4g8-8.png)
+
+![](screenshots/extras/lake-aditional-extra.png)
