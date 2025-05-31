@@ -28,3 +28,10 @@ The image below shows our trees and also the tree that can be parameterized (the
 for the change of the tree's values.
 
 ![](screenshots/project-t4g8-3.png)
+
+## project-t4g8-4
+
+Our helicopter is shown below and in it we can see the textures that were used as well as the objects that we used to create it. The main body and helices are made
+of a metal looking texture and the window is made with a texture that resembles the glass used in a "real life" helicopter.
+
+![](screenshots/project-t4g8-4.png)
