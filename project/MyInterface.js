@@ -28,9 +28,10 @@ export class MyInterface extends CGFinterface {
 
         this.gui.add(this.scene, 'displayAxis').name("Display axis");
 
-        this.gui.add(this.scene, 'displayNormals').name("Display normals");
-
         this.gui.add(this.scene, 'speedFactor', 0.1, 3).name("Speed Factor").onChange(this.scene.updateSpeedFactor.bind(this.scene));
+
+        // Helicopter max height
+        this.gui.add(this.scene.heli, 'helicopterMaxFlyHeigh', 3.0, 15.0).name('Max Fly Height').onChange(this.scene.heli.updateHelicopterMaxFlyHeight.bind(this.scene.heli));
 
         // Tree folder
         var f0 = this.gui.addFolder('Tree Settings');
@@ -57,9 +58,6 @@ export class MyInterface extends CGFinterface {
         f3.add(this.scene, 'windowCount', 2, 8).step(1).name("Floor Window Count").onChange(this.scene.updateFloorWindowCount.bind(this.scene));
         f3.add(this.scene, 'defaultWindow', this.scene.windowTextureList).name("Window Texture").onChange(this.scene.updateWindowTexture.bind(this.scene));
         f3.addColor(this.scene, 'buildingColor').onChange(this.scene.updateBuildingColor.bind(this.scene));
-
-        // Helicopter max height
-        this.gui.add(this.scene.heli, 'helicopterMaxFlyHeigh', 3.0, 15.0).name('Max Fly Height').onChange(this.scene.heli.updateHelicopterMaxFlyHeight.bind(this.scene.heli));
 
         // disable the processKeyboard function
         this.processKeyboard = function () { };

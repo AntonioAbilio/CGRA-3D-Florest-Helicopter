@@ -32,7 +32,6 @@ export class MyScene extends CGFscene {
     this.gl.depthFunc(this.gl.LEQUAL);
 
     this.displayAxis = false;
-    this.displayNormals = false;
 
     // World variables
     this.baseAcceleration = 9.8;
